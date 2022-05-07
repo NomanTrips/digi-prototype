@@ -1,0 +1,16 @@
+{
+   "messages":[
+      {
+		 "messageId": 1,
+	     "sender":"Human",
+         "message_text":"Hello, who are you?"
+
+      },
+      {
+	     "messageId": 2,
+	     "sender":"AI",
+         "message_text":"I am an AI created by OpenAI. How can I help you today?"
+
+      }
+   ]
+}
