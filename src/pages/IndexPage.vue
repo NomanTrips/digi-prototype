@@ -8,7 +8,7 @@
             v-for="message in convo_json.messages"
             :key="message.messageId"
             :name="message.sender"
-            :avatar="message.sender == 'AI' ? '/src/assets/robot_avatar3.png' : 'https://cdn.quasar.dev/img/avatar1.jpg'"
+            :avatar="message.sender == 'AI' ? '/icons/robot_avatar3.png' : 'https://cdn.quasar.dev/img/avatar1.jpg'"
             :text="[message.message_text]"
             :sent="message.sender != 'AI'"
             :bg-color="message.sender == 'AI' ? 'pink' : 'light-grey'"
