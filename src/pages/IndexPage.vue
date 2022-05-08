@@ -1,4 +1,4 @@
-<template @clicked="callback_func">
+<template >
 
   <div class="q-pa-md row justify-center" >
     <div style="width: 100%; max-width: 500px">
@@ -19,7 +19,7 @@
       <q-chat-message
             v-show="toggle_spinner"
             name="AI"
-            avatar="/src/assets/robot_avatar3.png"
+            avatar="/icons/robot_avatar3.png"
             bg-color="pink"
             text-color="white"
       >
