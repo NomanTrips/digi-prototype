@@ -16,8 +16,142 @@
         <q-toolbar-title>
           Digissist
         </q-toolbar-title>
+        <div style="padding:20px;">version 0.1</div>
+        <div>
+          <q-btn
+            v-show="user_id === null"
+            flat
+            dense
+            round
+            icon="login"
+            aria-label="login"
+            to="/login"
+          />
 
-        <div>version .1</div>
+
+    <q-btn-dropdown
+      v-show="user_id != null"
+      outline
+      color="white"
+      fab-mini
+      icon="account_circle"
+      @click="getSettings"
+    >
+      <div class="row no-wrap q-pa-md" style="width:400px">
+        <div class="col-8">
+          <div class="text-h6 q-mb-md">Settings</div>
+          <div v-show="is_updating">
+            Saving...
+            <q-spinner
+              color="pink"
+              size="2em"
+              />
+          </div>
+
+    <q-list>
+      <!--
+        Rendering a <label> tag (notice tag="label")
+        so QRadios will respond to clicks on QItems to
+        change Toggle state.
+      -->
+
+      <q-item :disable="is_updating" tag="label" v-ripple>
+        <q-item-section avatar>
+          <q-radio v-model="bot_avatar" val="robot-1" color="pink" />
+        </q-item-section>
+        <q-item-section>
+          <q-item-label>Robot 1</q-item-label>
+        </q-item-section>
+        <q-item-section>
+          <q-avatar>
+            <img src="../assets/robot-1.png">
+          </q-avatar>
+        </q-item-section>        
+      </q-item>
+
+      <q-item :disable="is_updating" tag="label" v-ripple>
+        <q-item-section avatar>
+          <q-radio v-model="bot_avatar" val="robot-2" color="pink" />
+        </q-item-section>
+        <q-item-section>
+          <q-item-label>Robot 2</q-item-label>
+        </q-item-section>
+        <q-item-section>
+          <q-avatar>
+            <img src="../assets/robot-2.png">
+          </q-avatar>
+        </q-item-section>        
+      </q-item>
+
+      <q-item :disable="is_updating" tag="label" v-ripple>
+        <q-item-section avatar>
+          <q-radio v-model="bot_avatar" val="robot-3" color="pink" />
+        </q-item-section>
+        <q-item-section>
+          <q-item-label>Robot 3</q-item-label>
+        </q-item-section>
+        <q-item-section>
+          <q-avatar>
+            <img src="../assets/robot-3.png">
+          </q-avatar>
+        </q-item-section>        
+      </q-item>
+
+      <q-item :disable="is_updating" tag="label" v-ripple>
+        <q-item-section avatar>
+          <q-radio v-model="bot_avatar" val="robot-4" color="pink" />
+        </q-item-section>
+        <q-item-section>
+          <q-item-label>Robot 4</q-item-label>
+        </q-item-section>
+        <q-item-section>
+          <q-avatar>
+            <img src="../assets/robot-4.png">
+          </q-avatar>
+        </q-item-section>        
+      </q-item>
+
+      <q-item :disable="is_updating" tag="label" v-ripple>
+        <q-item-section avatar>
+          <q-radio v-model="bot_avatar" val="robot-5" color="pink" />
+        </q-item-section>
+        <q-item-section>
+          <q-item-label>Robot 5</q-item-label>
+        </q-item-section>
+        <q-item-section>
+          <q-avatar>
+            <img src="../assets/robot-5.png">
+          </q-avatar>
+        </q-item-section>        
+      </q-item>
+
+    </q-list>
+
+        </div>
+
+        <q-separator vertical inset class="q-mx-lg" />
+
+        <div class="column items-center">
+          <q-avatar size="72px">
+            <img src="https://cdn.quasar.dev/img/boy-avatar.png">
+          </q-avatar>
+
+          <div class="text-subtitle1 q-mt-md q-mb-xs">{{user_id}}</div>
+
+          <q-btn
+            color="pink"
+            label="Logout"
+            push
+            size="sm"
+            v-close-popup
+            @click="logout"
+          />
+        </div>
+      </div>
+    </q-btn-dropdown>
+
+        </div>
+
       </q-toolbar>
     </q-header>
 
@@ -51,6 +185,7 @@
 <script>
 import { defineComponent, ref } from 'vue'
 import EssentialLink from 'components/EssentialLink.vue'
+import axios from "axios"
 
 const linksList = [
   {
@@ -103,7 +238,96 @@ export default defineComponent({
   components: {
     EssentialLink
   },
-
+  data: function (){
+    return {
+      user_id: null,
+      bot_avatar: 'robot-1',
+      is_updating: false,
+      err_msg : '',
+      is_failure: false,
+      is_signed_in: true,
+      is_loading: false,
+    }
+  },
+  created: function (){
+    var vm = this; // vm = view model, the vue instance
+    if (localStorage.user_id) {
+      this.user_id = localStorage.user_id;
+      this.is_signed_in = true;
+    }
+  },
+  watch: {
+    bot_avatar(old_avatar, new_avatar){
+      var vm = this;
+      if (vm.is_loading === false && new_avatar != old_avatar){
+        vm.updateSettings();  
+      }     
+    },
+    name(user_id) {
+      localStorage.user_id = user_id;
+    },
+  },
+  methods: {
+    logout: function (){
+      var vm = this;
+      localStorage.removeItem('user_id')
+    },
+    updateSettings: function (){
+      var vm = this;
+          vm.is_failure = false;
+          vm.is_updating = true;
+          const api_headers = {
+            'Content-Type': 'application/json',
+          }
+            //axios.post(`http://localhost:3000/users/${localStorage.user_id}/settings`, {
+              axios.post(`${process.env.API}/users/${localStorage.user_id}/settings`, {
+                    bot_avatar: vm.bot_avatar,
+                },
+                {
+                headers: api_headers
+                }
+                )
+                .then(function (response) {
+                    console.log(response);
+                    if (response.status === 200){
+                      console.log(response.data)
+                    } else{
+                        vm.is_failure = true;
+                        vm.err_msg = 'Failed to update setting';
+                    }
+                })
+                .catch(function (error) {
+                    console.log(error);
+                    vm.is_failure = true;
+                    vm.err_msg = error;
+                })
+                .then(function () {
+                  // always executed
+                  vm.is_updating = false;
+                });
+    },
+      getSettings: function (){
+      var vm = this;
+      vm.is_loading = true;
+      if (vm.is_signed_in){
+        //axios.get(`http://localhost:3000/users/${localStorage.user_id}/settings`)  process.env.API
+        axios.get(`${process.env.API}/users/${localStorage.user_id}/settings`)
+          .then(function (response) {
+            // handle success
+            console.log(response);
+            vm.bot_avatar = response.data.bot_avatar
+          })
+          .catch(function (error) {
+            // handle error
+            console.log(error);
+          })
+          .then(function () {
+            // always executed
+            vm.is_loading = false;
+          });
+      }
+    },
+  },
   setup () {
     const leftDrawerOpen = ref(false)
 

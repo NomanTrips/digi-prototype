@@ -7,7 +7,20 @@ const routes = [
       { path: '', component: () => import('pages/IndexPage.vue') }
     ]
   },
-
+  {
+    path: '/login',
+    component: () => import('layouts/MainLayout.vue'),
+    children: [
+      { path: '', component: () => import('pages/LoginPage.vue') }
+    ]
+  },
+  {
+    path: '/signup',
+    component: () => import('layouts/MainLayout.vue'),
+    children: [
+      { path: '', component: () => import('pages/SignupPage.vue') }
+    ]
+  },
   // Always leave this as last one,
   // but you can also remove it
   {

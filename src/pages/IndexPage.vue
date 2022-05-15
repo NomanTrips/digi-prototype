@@ -8,7 +8,7 @@
             v-for="message in convo_json.messages"
             :key="message.messageId"
             :name="message.sender"
-            :avatar="message.sender == 'AI' ? '/icons/robot_avatar3.png' : 'https://cdn.quasar.dev/img/avatar1.jpg'"
+            :avatar="message.sender == 'AI' ? getBotAvatarPath : 'https://cdn.quasar.dev/img/avatar1.jpg'"
             :text="[message.message_text]"
             :sent="message.sender != 'AI'"
             :bg-color="message.sender == 'AI' ? 'pink' : 'light-grey'"
@@ -19,7 +19,7 @@
       <q-chat-message
             v-show="toggle_spinner"
             name="AI"
-            avatar="/icons/robot_avatar3.png"
+            :avatar="getBotAvatarPath"
             bg-color="pink"
             text-color="white"
       >
@@ -89,6 +89,8 @@ import axios from "axios"
 import { v4 as uuidv4 } from 'uuid'
 import _ from "lodash"
 import { ref } from 'vue'
+//import DotEnv  from "dotenv"
+//const parsedEnv = DotEnv.config().parsed
 
 export default defineComponent({
   name: 'IndexPage',
@@ -101,12 +103,48 @@ export default defineComponent({
       user_input: "",
       msg_sequence: 2,
       toggle_spinner: false,
+      user_id: 0,
+      is_signed_in: true,
+      bot_avatar: 'robot-1',
+      //user_setting:{
+      //  bot_avatar: 'robot_1',
+      //},
+    }
+  },
+  computed: {
+    // a computed getter
+    getBotAvatarPath() {
+      var vm = this;
+      if (vm.bot_avatar === 'robot-2') {
+        return `${process.env.ICON_PATH}/robot-2.png`
+      } else if (vm.bot_avatar === 'robot-3'){
+        return `${process.env.ICON_PATH}/robot-3.png`
+      } else if (vm.bot_avatar === 'robot-4'){
+        return `${process.env.ICON_PATH}/robot-4.png`
+      } else if (vm.bot_avatar === 'robot-5'){
+        return `${process.env.ICON_PATH}/robot-5.png`
+      } else {
+        return `${process.env.ICON_PATH}/robot-1.png`
+      }
     }
   },
   created: function (){
     var vm = this; // vm = view model, the vue instance
+    if (localStorage.user_id) {
+      this.user_id = localStorage.user_id;
+      this.is_signed_in = true;
+      vm.getSettings();
+    }
     vm.loadTemplate('Conversation');
     
+  },
+  mounted() {
+
+  },
+  watch: {
+    name(user_id) {
+      localStorage.user_id = user_id;
+    }
   },
   methods: {
     radio: function (){
@@ -153,7 +191,8 @@ export default defineComponent({
         'Content-Type': 'application/json',
         //'Authorization': vm.openai_key,
       }
-      axios.post('https://digissist-server.azurewebsites.net/completions', {
+      //axios.post('https://digissist-server.azurewebsites.net/completions', {
+      axios.post(`${process.env.API}/completions`, {
           engine: "text-davinci-002",
           prompt: vm.convo_template,
           max_tokens: 150,
@@ -187,7 +226,26 @@ export default defineComponent({
           console.log(error);
           vm.toggle_spinner = false;
         });
-    }
+    },
+    getSettings: function (){
+      var vm = this;
+      if (vm.is_signed_in){
+        //axios.get(`http://localhost:3000/users/${localStorage.user_id}/settings`)
+        axios.get(`${process.env.API}/users/${localStorage.user_id}/settings`)
+          .then(function (response) {
+            // handle success
+            console.log(response);
+            vm.bot_avatar = response.data.bot_avatar
+          })
+          .catch(function (error) {
+            // handle error
+            console.log(error);
+          })
+          .then(function () {
+            // always executed
+          });
+      }
+    },
   },
    setup () {
     return {
