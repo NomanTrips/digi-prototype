@@ -35,6 +35,7 @@
 
             <q-input
                 filled
+                :type="isPwd ? 'password' : 'text'"
                 color="pink"
                 v-model="password"
                 label="Password"
@@ -42,10 +43,19 @@
                 :rules="[
                 val => val !== null && val !== '' || 'Please type your password',
                 ]"
-            />
+            >
+              <template v-slot:append>
+                <q-icon
+                  :name="isPwd ? 'visibility_off' : 'visibility'"
+                  class="cursor-pointer"
+                  @click="isPwd = !isPwd"
+                />
+              </template>
+            </q-input>
 
             <q-input
                 filled
+                :type="isPwd ? 'password' : 'text'"
                 color="pink"
                 v-model="retyped_password"
                 label="Re-type password:"
@@ -54,7 +64,15 @@
                 val => val !== null && val !== '' || 'Please re-type your password',
                 retyped_password === password
                 ]"
-            />
+            >
+              <template v-slot:append>
+                <q-icon
+                  :name="isPwd ? 'visibility_off' : 'visibility'"
+                  class="cursor-pointer"
+                  @click="isPwd = !isPwd"
+                />
+              </template>
+            </q-input>
 
             <q-input
                 filled
@@ -123,6 +141,7 @@ export default defineComponent({
         username_pw_tf : false,
         accept: true,
         is_failure: false,
+        isPwd: true,
     }
   },
   created: function (){

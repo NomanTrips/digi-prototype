@@ -1,4 +1,4 @@
-<template >
+<template>
 
   <div class="q-pa-md row justify-center" >
     <div style="width: 100%; max-width: 500px">
@@ -8,7 +8,7 @@
             v-for="message in convo_json.messages"
             :key="message.messageId"
             :name="message.sender"
-            :avatar="message.sender == 'AI' ? getBotAvatarPath : 'https://cdn.quasar.dev/img/avatar1.jpg'"
+            :avatar="message.sender == 'AI' ? getBotAvatarPath : 'https://cdn.quasar.dev/img/boy-avatar.png'"
             :text="[message.message_text]"
             :sent="message.sender != 'AI'"
             :bg-color="message.sender == 'AI' ? 'pink' : 'light-grey'"
@@ -89,8 +89,7 @@ import axios from "axios"
 import { v4 as uuidv4 } from 'uuid'
 import _ from "lodash"
 import { ref } from 'vue'
-//import DotEnv  from "dotenv"
-//const parsedEnv = DotEnv.config().parsed
+
 
 export default defineComponent({
   name: 'IndexPage',
@@ -136,13 +135,13 @@ export default defineComponent({
       vm.getSettings();
     }
     vm.loadTemplate('Conversation');
-    
   },
   mounted() {
 
   },
   watch: {
     name(user_id) {
+      console.log('watcher firing');
       localStorage.user_id = user_id;
     }
   },

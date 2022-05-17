@@ -13,7 +13,6 @@
         <q-card-section>
             <q-form
             @submit="onSubmit"
-            @reset="onReset"
             class="q-gutter-md"
             >
             <q-input
@@ -27,6 +26,7 @@
 
             <q-input
                 filled
+                :type="isPwd ? 'password' : 'text'"
                 color="pink"
                 v-model="password"
                 label="Password"
@@ -34,14 +34,29 @@
                 :rules="[
                 val => val !== null && val !== '' || 'Please type your password',
                 ]"
-            />
+            >
+              <template v-slot:append>
+                <q-icon
+                  :name="isPwd ? 'visibility_off' : 'visibility'"
+                  class="cursor-pointer"
+                  @click="isPwd = !isPwd"
+                />
+              </template>
+            </q-input>
 
             <q-toggle color="pink" v-model="accept" label="I agree to the ai pledge" />
 
-            <div>
-                <q-btn outline label="Login" type="submit" color="pink"/>
-                <q-btn outline label="Signup" color="pink" to="/signup"/>
+          <div class="row">
+
+        
+            <div class="q-pl-xs">
+                <q-btn outline label="Login" type="submit" color="pink" />
+               
             </div>
+            <div class="q-pl-xs">
+                 <q-btn outline label="Signup" color="pink" to="/signup" />
+            </div>
+              </div>
             </q-form>            
         </q-card-section>
       </q-card>
@@ -62,6 +77,7 @@ export default defineComponent({
         accept: true,
         is_failure: false,
         err_msg: "",
+        isPwd: true,
     }
   },
   created: function (){
@@ -87,7 +103,11 @@ export default defineComponent({
                     if (response.status === 200){
                         console.log(`login resp data:  ${response.data}`)
                         localStorage.user_id = response.data.user_id;
-                        vm.$router.push('/')
+                        //vm.$root.$forceUpdate();
+                        //console.log(vm.$parent.name);
+                                                //vm.$router.go();
+                        vm.$router.push('/');
+
                     } else{
                         vm.is_failure = true;
                         vm.err_msg = 'Unknown';

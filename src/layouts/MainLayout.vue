@@ -19,7 +19,7 @@
         <div style="padding:20px;">version 0.1</div>
         <div>
           <q-btn
-            v-show="user_id === null"
+            v-show="is_signed_in === false"
             flat
             dense
             round
@@ -30,7 +30,7 @@
 
 
     <q-btn-dropdown
-      v-show="user_id != null"
+      v-show="is_signed_in === true"
       outline
       color="white"
       fab-mini
@@ -245,15 +245,29 @@ export default defineComponent({
       is_updating: false,
       err_msg : '',
       is_failure: false,
-      is_signed_in: true,
+      is_signed_in: false,
       is_loading: false,
     }
   },
   created: function (){
+    //console.log(`masthead create`)
     var vm = this; // vm = view model, the vue instance
     if (localStorage.user_id) {
       this.user_id = localStorage.user_id;
       this.is_signed_in = true;
+    }
+  },
+  mounted() {
+    //console.log(`the masthead is now mounted.`)
+  },
+  updated(){
+    //console.log(`masthead update`)
+      var vm = this; // vm = view model, the vue instance
+    if (localStorage.user_id) {
+      vm.user_id = localStorage.user_id;
+      vm.is_signed_in = true;
+    } else{
+      vm.is_signed_in = false;
     }
   },
   watch: {
@@ -270,7 +284,8 @@ export default defineComponent({
   methods: {
     logout: function (){
       var vm = this;
-      localStorage.removeItem('user_id')
+      localStorage.removeItem('user_id');
+      vm.is_signed_in = false;
     },
     updateSettings: function (){
       var vm = this;
@@ -290,7 +305,7 @@ export default defineComponent({
                 .then(function (response) {
                     console.log(response);
                     if (response.status === 200){
-                      console.log(response.data)
+                      vm.$router.go();
                     } else{
                         vm.is_failure = true;
                         vm.err_msg = 'Failed to update setting';
