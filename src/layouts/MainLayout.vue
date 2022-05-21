@@ -39,7 +39,7 @@
     >
       <div class="row no-wrap q-pa-md" style="width:400px">
         <div class="col-8">
-          <div class="text-h6 q-mb-md">Settings</div>
+          <div class="text-h6 q-mb-md">Choose AI skin:</div>
           <div v-show="is_updating">
             Saving...
             <q-spinner
@@ -57,70 +57,70 @@
 
       <q-item :disable="is_updating" tag="label" v-ripple>
         <q-item-section avatar>
-          <q-radio v-model="bot_avatar" val="robot-1" color="pink" />
+          <q-radio v-model="bot_avatar" val="default" color="pink" />
         </q-item-section>
         <q-item-section>
-          <q-item-label>Robot 1</q-item-label>
+          <q-item-label>default</q-item-label>
         </q-item-section>
         <q-item-section>
           <q-avatar>
-            <img src="../assets/robot-1.png">
+            <img src="../assets/default.png">
           </q-avatar>
         </q-item-section>        
       </q-item>
 
       <q-item :disable="is_updating" tag="label" v-ripple>
         <q-item-section avatar>
-          <q-radio v-model="bot_avatar" val="robot-2" color="pink" />
+          <q-radio v-model="bot_avatar" val="green_spark" color="pink" />
         </q-item-section>
         <q-item-section>
-          <q-item-label>Robot 2</q-item-label>
+          <q-item-label>green spark</q-item-label>
         </q-item-section>
         <q-item-section>
           <q-avatar>
-            <img src="../assets/robot-2.png">
+            <img src="../assets/green_spark.png">
           </q-avatar>
         </q-item-section>        
       </q-item>
 
       <q-item :disable="is_updating" tag="label" v-ripple>
         <q-item-section avatar>
-          <q-radio v-model="bot_avatar" val="robot-3" color="pink" />
+          <q-radio v-model="bot_avatar" val="penguin" color="pink" />
         </q-item-section>
         <q-item-section>
-          <q-item-label>Robot 3</q-item-label>
+          <q-item-label>penguin</q-item-label>
         </q-item-section>
         <q-item-section>
           <q-avatar>
-            <img src="../assets/robot-3.png">
+            <img src="../assets/penguin.png">
           </q-avatar>
         </q-item-section>        
       </q-item>
 
       <q-item :disable="is_updating" tag="label" v-ripple>
         <q-item-section avatar>
-          <q-radio v-model="bot_avatar" val="robot-4" color="pink" />
+          <q-radio v-model="bot_avatar" val="owley" color="pink" />
         </q-item-section>
         <q-item-section>
-          <q-item-label>Robot 4</q-item-label>
+          <q-item-label>owley</q-item-label>
         </q-item-section>
         <q-item-section>
           <q-avatar>
-            <img src="../assets/robot-4.png">
+            <img src="../assets/owley.png">
           </q-avatar>
         </q-item-section>        
       </q-item>
 
       <q-item :disable="is_updating" tag="label" v-ripple>
         <q-item-section avatar>
-          <q-radio v-model="bot_avatar" val="robot-5" color="pink" />
+          <q-radio v-model="bot_avatar" val="diaspora" color="pink" />
         </q-item-section>
         <q-item-section>
-          <q-item-label>Robot 5</q-item-label>
+          <q-item-label>diaspora</q-item-label>
         </q-item-section>
         <q-item-section>
           <q-avatar>
-            <img src="../assets/robot-5.png">
+            <img src="../assets/diaspora.png">
           </q-avatar>
         </q-item-section>        
       </q-item>
@@ -241,7 +241,7 @@ export default defineComponent({
   data: function (){
     return {
       user_id: null,
-      bot_avatar: 'robot-1',
+      bot_avatar: 'default',
       is_updating: false,
       err_msg : '',
       is_failure: false,

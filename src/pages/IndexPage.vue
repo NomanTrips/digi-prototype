@@ -8,13 +8,21 @@
             v-for="message in convo_json.messages"
             :key="message.messageId"
             :name="message.sender"
-            :avatar="message.sender == 'AI' ? getBotAvatarPath : 'https://cdn.quasar.dev/img/boy-avatar.png'"
             :text="[message.message_text]"
             :sent="message.sender != 'AI'"
             :bg-color="message.sender == 'AI' ? 'pink' : 'light-grey'"
             :text-color="message.sender == 'AI' ? 'white' : 'black'"
             
-          />
+          >
+
+          <template v-slot:avatar="props">
+            <q-avatar size="58px" :props="props" class="q-mx-xs">
+              <img v-show="message.sender == 'AI'" :src="getBotAvatarPath">
+              <img v-show="message.sender != 'AI'" src="https://cdn.quasar.dev/img/boy-avatar.png">
+            </q-avatar>            
+          </template>
+          </q-chat-message>
+
 
       <q-chat-message
             v-show="toggle_spinner"
@@ -104,7 +112,8 @@ export default defineComponent({
       toggle_spinner: false,
       user_id: 0,
       is_signed_in: true,
-      bot_avatar: 'robot-1',
+      bot_avatar: 'default',
+      is_loading: false,
       //user_setting:{
       //  bot_avatar: 'robot_1',
       //},
@@ -114,16 +123,20 @@ export default defineComponent({
     // a computed getter
     getBotAvatarPath() {
       var vm = this;
-      if (vm.bot_avatar === 'robot-2') {
-        return `${process.env.ICON_PATH}/robot-2.png`
-      } else if (vm.bot_avatar === 'robot-3'){
-        return `${process.env.ICON_PATH}/robot-3.png`
-      } else if (vm.bot_avatar === 'robot-4'){
-        return `${process.env.ICON_PATH}/robot-4.png`
-      } else if (vm.bot_avatar === 'robot-5'){
-        return `${process.env.ICON_PATH}/robot-5.png`
+      if (vm.is_loading){
+        return `${process.env.ICON_PATH}/white_square.png`;
       } else {
-        return `${process.env.ICON_PATH}/robot-1.png`
+        if (vm.bot_avatar === 'green_spark') {
+          return `${process.env.ICON_PATH}/green_spark.png`
+        } else if (vm.bot_avatar === 'penguin'){
+          return `${process.env.ICON_PATH}/penguin.png`
+        } else if (vm.bot_avatar === 'owley'){
+          return `${process.env.ICON_PATH}/owley.png`
+        } else if (vm.bot_avatar === 'diaspora'){
+          return `${process.env.ICON_PATH}/diaspora.png`
+        } else {
+          return `${process.env.ICON_PATH}/default.png`
+        }
       }
     }
   },
@@ -228,6 +241,7 @@ export default defineComponent({
     },
     getSettings: function (){
       var vm = this;
+      vm.is_loading = true;
       if (vm.is_signed_in){
         //axios.get(`http://localhost:3000/users/${localStorage.user_id}/settings`)
         axios.get(`${process.env.API}/users/${localStorage.user_id}/settings`)
@@ -242,6 +256,7 @@ export default defineComponent({
           })
           .then(function () {
             // always executed
+            vm.is_loading = false;
           });
       }
     },
@@ -253,3 +268,11 @@ export default defineComponent({
    }
 })
 </script>
+<style scoped>
+img q-message-avatar {
+    border-radius: 50%;
+    width: 64px;
+    height: 64px;
+    min-width: 64px;
+}
+</style>
