@@ -37,13 +37,32 @@
         </q-card-section>
         <q-separator />
         <q-card-section>
-          <div class="q-pa-md" style="max-width: 500px">
+
+
+
+          <div  style="max-width: 500px">
+          <q-chat-message
+            style="font-style:italic;flex:auto;"
+            v-show="prompt_type == 'summarization'"
+            name="Human"
+            :text="[`I'd like help summarizing some text. The text is: ...........................`]"
+            text-color="grey-7"
+            sent
+          >
+          <template v-slot:avatar>
+            <q-avatar size="58px" class="q-mx-xs">
+              <img src="https://cdn.quasar.dev/img/boy-avatar.png">
+            </q-avatar>            
+          </template>
+          </q-chat-message>
             <q-input
               v-model="user_input"
               outlined
               color="pink"
               autogrow
               :disable="toggle_spinner"
+              :placeholder="prompt_type == 'summarization' ? '[Insert Text Here]':''"
+              placeholder-color="orange"
             >
             <template v-slot:after>
             <q-btn round dense flat icon="send" @click="send_message"/>
@@ -52,10 +71,9 @@
   </div>
               </q-card-section>
                     <q-card-actions align="around">
+        <q-btn outline color="pink" icon="edit_note" @click="card = true" >Edit prompt</q-btn>
+        <q-btn outline color="pink" icon="collections_bookmark" @click="radio">Prompt Templates</q-btn>
         <q-btn outline color="pink" icon="content_paste">Paste</q-btn>
-        <q-btn outline color="pink" icon="refresh">Clear</q-btn>
-        <q-btn outline color="pink" icon="collections_bookmark" @click="radio">Templates</q-btn>
-        <q-btn outline color="pink" icon="edit_note" @click="card = true" >Edit text</q-btn>
 
     <q-dialog v-model="card">
       <q-card class="my-card">
@@ -106,6 +124,8 @@ export default defineComponent({
   data: function (){
     return {
       convo_template: "The following is a conversation with an AI assistant. The assistant is helpful, creative, clever, and very friendly.\r\n\r\nHuman: Hello, who are you?\r\nAI: I am an AI created by OpenAI. How can I help you today?\r\n\r\nHuman: ",
+      summarization_template: "The following is a conversation with an AI assistant. The assistant is helpful, creative, clever, and very friendly.\r\n\r\nHuman: Hello, who are you?\r\nAI: I am an AI created by OpenAI. How can I help you today?\r\n\r\nHuman: Can you summarize this into one sentance for me?\r\n",
+      generic_conversation_template: "The following is a conversation with an AI assistant. The assistant is helpful, creative, clever, and very friendly.\r\n\r\nHuman: Hello, who are you?\r\nAI: I am an AI created by OpenAI. How can I help you today?\r\n\r\nHuman: ",
       convo_json: {"messages":[]},
       user_input: "",
       msg_sequence: 2,
@@ -114,6 +134,8 @@ export default defineComponent({
       is_signed_in: true,
       bot_avatar: 'default',
       is_loading: false,
+      message_prefix: "",
+      prompt_type: "generic_conversation",
       //user_setting:{
       //  bot_avatar: 'robot_1',
       //},
@@ -160,6 +182,7 @@ export default defineComponent({
   },
   methods: {
     radio: function (){
+      var vm = this;
       this.$q.dialog({
         title: 'Templates',
         message: 'Choose an conversation template:',
@@ -168,23 +191,31 @@ export default defineComponent({
           model: 'opt1',
           // inline: true
           items: [
-            { label: 'TL;DR Summarization', value: 'opt1', color: 'pink' },
-            { label: 'Question and answering', value: 'opt2', color: 'pink' },
-            { label: 'Free form conversation', value: 'opt3', color: 'pink' }
+            { label: 'Generic conversation', value: 'generic_conversation', color: 'pink' },
+            { label: 'Summarize text', value: 'summarization', color: 'pink' },
           ]
         },
         cancel: true,
         persistent: true
       }).onOk(data => {
-        // console.log('>>>> OK, received', data)
+         //console.log('>>>> OK, received', data);
+         vm.loadTemplate(data);
       }).onCancel(() => {
-        // console.log('>>>> Cancel')
+         console.log('>>>> Cancel')
       }).onDismiss(() => {
         // console.log('I am triggered on both OK and Cancel')
       })
     },
     loadTemplate: function (template_name) {
       var vm = this;
+      if (template_name === 'generic_conversation'){
+        vm.prompt_type = "generic_conversation";
+        vm.convo_template = vm.generic_conversation_template;
+      } else if (template_name === 'summarization'){
+        vm.prompt_type = "summarization";
+        vm.convo_template = vm.summarization_template;
+        vm.message_prefix = "Can you summarize this into one sentance for me?\r\n"
+      }
       vm.convo_json = TestJson;
     },
     send_message: function (){
@@ -192,13 +223,13 @@ export default defineComponent({
       var human_message = {
 		    "messageId": uuidv4(), // make this guid
 	      "sender":"Human",
-        "message_text": vm.user_input
+        "message_text": vm.message_prefix + vm.user_input
       };
       human_message.messageId =  human_message.messageId + 1;
       vm.convo_json.messages.push(human_message);
-      vm.user_input = "";
       vm.toggle_spinner = true;
-      vm.convo_template = String(vm.convo_template) + String(human_message.message_text) + '\r\n';
+      vm.convo_template = String(vm.convo_template) + String(vm.user_input) + '\r\n';
+      vm.user_input = "";
       const api_headers = {
         'Content-Type': 'application/json',
         //'Authorization': vm.openai_key,
@@ -229,14 +260,19 @@ export default defineComponent({
           vm.toggle_spinner = false;
           vm.convo_json.messages.push(ai_message);
           vm.convo_template = String(vm.convo_template) + String(ai_message.message_text) + '\r\n\r\n' + 'Human: ';
-          //console.log(":::Messages Obj:::");
-          //console.log(vm.convo_json);
-          //console.log(":::Messages str:::");
-          //console.log(vm.convo_template);
+          console.log(":::Messages Obj:::");
+          console.log(vm.convo_json);
+          console.log(":::Messages str:::");
+          console.log(vm.convo_template);
         })
         .catch(function (error) {
           console.log(error);
           vm.toggle_spinner = false;
+        })
+        .then(function () {
+          // always executed
+          vm.prompt_type = "generic_conversation"; // even if coming from summarization task, set to genric after to continue w additional questions
+          vm.message_prefix = "";
         });
     },
     getSettings: function (){
@@ -247,7 +283,6 @@ export default defineComponent({
         axios.get(`${process.env.API}/users/${localStorage.user_id}/settings`)
           .then(function (response) {
             // handle success
-            console.log(response);
             vm.bot_avatar = response.data.bot_avatar
           })
           .catch(function (error) {
