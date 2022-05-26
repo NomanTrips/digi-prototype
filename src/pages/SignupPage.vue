@@ -28,7 +28,8 @@
                 filled
                 color="pink"
                 v-model="username"
-                label="Username"
+                label="Username*"
+                label-color="pink"
                 lazy-rules
                 :rules="[ val => val && val.length > 0 || 'Please enter your username']"
             />
@@ -38,7 +39,8 @@
                 :type="isPwd ? 'password' : 'text'"
                 color="pink"
                 v-model="password"
-                label="Password"
+                label="Password*"
+                label-color="pink"
                 lazy-rules
                 :rules="[
                 val => val !== null && val !== '' || 'Please type your password',
@@ -58,7 +60,8 @@
                 :type="isPwd ? 'password' : 'text'"
                 color="pink"
                 v-model="retyped_password"
-                label="Re-type password:"
+                label="Re-type password:*"
+                label-color="pink"
                 lazy-rules
                 :rules="[
                 val => val !== null && val !== '' || 'Please re-type your password',
@@ -75,13 +78,20 @@
             </q-input>
 
             <q-input
+              color="pink"
+              v-model="email"
+              filled
+              type="email"
+              label="Email*"
+              label-color="pink"
+            />
+
+            <q-input
                 filled
                 color="pink"
                 v-model="firstname"
-                label="Firstname *"
-                hint="Firstname"
-                lazy-rules
-                :rules="[ val => val && val.length > 0 || 'Please type something']"
+                label="Firstname"
+                hint="Optional"
             />
 
             <q-input
@@ -89,9 +99,7 @@
                 color="pink"
                 v-model="middle_initial"
                 label="Middle initial"
-                hint="middle initial"
-                lazy-rules
-                :rules="[ val => val && val.length > 0 || 'Please type something']"
+                hint="Optional"
             />
 
             <q-input
@@ -99,14 +107,15 @@
                 color="pink"
                 v-model="lastname"
                 label="Lastname"
-                hint="middle initial"
-                lazy-rules
-                :rules="[ val => val && val.length > 0 || 'Please type something']"
+                hint="Optional"
             />
 
-            <q-input color="pink" v-model="dob" filled type="date" hint="Date of Birth" />
-
-            <q-input color="pink" v-model="email" filled type="email" hint="Email" />
+            <q-input
+              color="pink"
+              v-model="dob"
+              filled type="date"
+              hint="Date of birth - Optional"
+            />
 
             <q-toggle color="pink" v-model="accept" label="I agree to the ai pledge" />
 

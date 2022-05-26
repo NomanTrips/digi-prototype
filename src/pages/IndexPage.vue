@@ -52,7 +52,7 @@
             size="10"
             v-show="prompt_type == 'summarization'"
             name="Human"
-            :text="[`Can you summarize this into one sentance for me?`]"
+            :text="[message_prefix]"
             text-color="grey-7"
             sent
           >
@@ -80,12 +80,12 @@
                     <q-card-actions align="around">
         <q-btn outline color="pink" icon="edit_note" @click="card = true" >Edit prompt</q-btn>
         <q-btn outline color="pink" icon="collections_bookmark" @click="radio">Prompt Templates</q-btn>
-        <q-btn outline color="pink" icon="settings">Settings</q-btn>
+        <q-btn outline color="pink" icon="settings" @click="show_settings = true">Settings</q-btn>
 
     <q-dialog v-model="card">
       <q-card class="my-card">
         <q-card-section>
-          <div class="text-h6">Edit conversation text:</div>
+          <div class="text-h6">Edit prompt text:</div>
         </q-card-section>
         <q-card-section>
           <div>
@@ -97,6 +97,28 @@
               autogrow
               style="width:500px;"
             />
+          </div>
+        </q-card-section>
+
+        <q-separator />
+        <q-card-actions align="right">
+          <q-btn v-close-popup outline color="pink" label="Okay" />
+        </q-card-actions>
+      </q-card>
+    </q-dialog>
+
+    <q-dialog v-model="show_settings">
+      <q-card class="my-card" style="width:400px;">
+        <q-card-section>
+          <div class="text-h6">AI Settings:</div>
+        </q-card-section>
+        <q-card-section>
+          <div>
+            <q-select outlined v-model="ai_model_engine" :options="ai_model_engines" label="GPT-3 model engine" color="pink">
+              <q-tooltip anchor="top middle" self="bottom middle" :offset="[10, 10]">
+                Davinci is the most powerful. Ada is the fastest.
+              </q-tooltip>
+            </q-select>
           </div>
         </q-card-section>
 
@@ -133,7 +155,7 @@ export default defineComponent({
       convo_template: "The following is a conversation with an AI assistant. The assistant is helpful, creative, clever, and very friendly.\r\n\r\nHuman: Hello, who are you?\r\nAI: I am an AI created by OpenAI. How can I help you today?\r\nHuman: ",
       summarization_template: "The following is a conversation with an AI assistant. The assistant is helpful, creative, clever, and very friendly.\r\n\r\nHuman: Hello, who are you?\r\nAI: I am an AI created by OpenAI. How can I help you today?\r\nHuman: Can you summarize this into one sentance for me?\r\n",
       summarization_long_template: "The following is a conversation with an AI assistant. The assistant is helpful, creative, clever, and very friendly.\r\n\r\nHuman: Hello, who are you?\r\nAI: I am an AI created by OpenAI. How can I help you today?\r\nHuman: Can you summarize the following text?\r\n",
-      //summarization_dev_template: "The following is a conversation with an AI assistant. The conversation is about software development.\r\n\r\nHuman: Hello, who are you?\r\nAI: I am an AI created by OpenAI. How can I help you today?\r\nHuman: Can you summarize this for me?\r\n",
+      summarization_dev_template: "The following is a conversation with an AI assistant. The conversation is about software development.\r\n\r\nHuman: Hello, who are you?\r\nAI: I am an AI created by OpenAI. How can I help you today?\r\nHuman: Can you summarize the following text?\r\n",
       generic_conversation_template: "The following is a conversation with an AI assistant. The assistant is helpful, creative, clever, and very friendly.\r\n\r\nHuman: Hello, who are you?\r\nAI: I am an AI created by OpenAI. How can I help you today?\r\nHuman: ",
       convo_json: {"messages":[]},
       user_input: "",
@@ -145,6 +167,8 @@ export default defineComponent({
       is_loading: false,
       message_prefix: "",
       prompt_type: "generic_conversation",
+      ai_model_engines: ['text-davinci-002', 'text-curie-001', 'text-babbage-001', 'text-ada-001'],
+      ai_model_engine: 'text-davinci-002',
       //user_setting:{
       //  bot_avatar: 'robot_1',
       //},
@@ -200,10 +224,10 @@ export default defineComponent({
           model: 'opt1',
           // inline: true
           items: [
-            { label: 'Generic conversation', value: 'generic_conversation', color: 'pink' },
+            { label: 'Generic conversation (default)', value: 'generic_conversation', color: 'pink' },
             { label: 'Summarization - into one sentance', value: 'summarization', color: 'pink' },
             { label: 'Summarization', value: 'summarization_long', color: 'pink' },
-            //{ label: 'Summarization - software development', value: 'summarization_dev', color: 'pink' },
+            { label: 'Summarization - software development', value: 'summarization_dev', color: 'pink' },
           ]
         },
         cancel: true,
@@ -229,6 +253,10 @@ export default defineComponent({
       } else if (template_name === 'summarization_long'){
         vm.prompt_type = "summarization";
         vm.convo_template = vm.summarization_long_template;
+        vm.message_prefix = "Can you summarize the following text?\r\n"
+      } else if (template_name === 'summarization_dev'){
+        vm.prompt_type = "summarization";
+        vm.convo_template = vm.summarization_dev_template;
         vm.message_prefix = "Can you summarize the following text?\r\n"
       }
       vm.convo_json = TestJson;
@@ -265,7 +293,7 @@ export default defineComponent({
       }
       //axios.post('https://digissist-server.azurewebsites.net/completions', {
       axios.post(`${process.env.API}/completions`, {
-          engine: "text-davinci-002",
+          engine: vm.ai_model_engine,
           prompt: vm.convo_template,
           max_tokens: 150,
           temperature: 0.9,
@@ -328,6 +356,7 @@ export default defineComponent({
    setup () {
     return {
       card: ref(false),
+      show_settings: ref(false),
     }
    }
 })
