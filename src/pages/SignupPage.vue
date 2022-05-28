@@ -90,11 +90,12 @@
                 filled
                 color="pink"
                 v-model="firstname"
-                label="Firstname"
-                hint="Optional"
+                label="Firstname*"
+                label-color="pink"
             />
 
             <q-input
+                v-show="false"
                 filled
                 color="pink"
                 v-model="middle_initial"
@@ -106,11 +107,12 @@
                 filled
                 color="pink"
                 v-model="lastname"
-                label="Lastname"
-                hint="Optional"
+                label="Lastname*"
+                label-color="pink"
             />
 
             <q-input
+              v-show="false"
               color="pink"
               v-model="dob"
               filled type="date"
