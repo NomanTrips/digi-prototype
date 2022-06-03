@@ -18,7 +18,7 @@
           <template v-slot:avatar="props">
             <q-avatar size="58px" :props="props" class="q-mx-xs" v-show="! is_loading">
               <img v-show="message.sender == 'AI'" :src="getBotAvatarPath">
-              <img v-show="message.sender != 'AI'" src="https://cdn.quasar.dev/img/boy-avatar.png">
+              <img v-show="message.sender != 'AI'" :src="getHumanAvatarPath">
             </q-avatar>
             <div v-show="is_loading" class="q-pa-xs">
               <q-spinner
@@ -58,7 +58,7 @@
           >
           <template v-slot:avatar>
             <q-avatar size="58px" class="q-mx-xs">
-              <img src="https://cdn.quasar.dev/img/boy-avatar.png">
+              <img :src="getHumanAvatarPath">
             </q-avatar>            
           </template>
           </q-chat-message>
@@ -163,6 +163,7 @@ export default defineComponent({
       toggle_spinner: false,
       user_id: 0,
       is_signed_in: true,
+      avatar: 'human_1',
       bot_avatar: 'default',
       is_loading: false,
       message_prefix: "",
@@ -191,6 +192,24 @@ export default defineComponent({
           return `${process.env.ICON_PATH}/diaspora.png`
         } else {
           return `${process.env.ICON_PATH}/default.png`
+        }
+      }
+    },
+    getHumanAvatarPath() {
+      var vm = this;
+      if (vm.is_loading){
+        return `${process.env.ICON_PATH}/white_square.png`;
+      } else {
+        if (vm.avatar === 'human_2') {
+          return `${process.env.ICON_PATH}/human_2.png`
+        } else if (vm.avatar === 'human_3'){
+          return `${process.env.ICON_PATH}/human_3.png`
+        } else if (vm.avatar === 'human_4'){
+          return `${process.env.ICON_PATH}/human_4.png`
+        } else if (vm.avatar === 'human_5'){
+          return `${process.env.ICON_PATH}/human_5.png`
+        } else {
+          return `${process.env.ICON_PATH}/human_1.png`
         }
       }
     }
@@ -340,7 +359,8 @@ export default defineComponent({
         axios.get(`${process.env.API}/users/${localStorage.user_id}/settings`)
           .then(function (response) {
             // handle success
-            vm.bot_avatar = response.data.bot_avatar
+            vm.bot_avatar = response.data.bot_avatar;
+            vm.avatar = response.data.avatar;
           })
           .catch(function (error) {
             // handle error

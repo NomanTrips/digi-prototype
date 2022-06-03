@@ -132,23 +132,91 @@
         <q-separator vertical inset class="q-mx-lg" />
 
         <div class="column items-center">
-          <q-avatar size="72px">
-            <img src="https://cdn.quasar.dev/img/boy-avatar.png">
-          </q-avatar>
+          <q-btn round @click="show_avatars = true">
+            <q-avatar size="64px">
+              <img :src="getHumanAvatarPath">
+            </q-avatar>
+            <q-tooltip>
+              Pick an Avatar
+            </q-tooltip>
+          </q-btn>
 
-          <div class="text-subtitle1 q-mt-md q-mb-xs">{{user_id}}</div>
 
-          <q-btn
-            color="pink"
-            label="Logout"
-            push
-            size="sm"
-            v-close-popup
-            @click="logout"
-          />
+          <div >
+            <div class="text-subtitle1 q-mt-md q-mb-xs">{{user_id}}</div>
+            <q-btn
+              color="pink"
+              label="Logout"
+              push
+              size="sm"
+              v-close-popup
+              @click="logout"
+            />
+          </div>
+
         </div>
       </div>
     </q-btn-dropdown>
+
+    <q-dialog v-model="show_avatars">
+      <q-card class="my-card" style="width:400px;">
+        <q-card-section>
+          <div class="text-h6">Pick your avatar:</div>
+        </q-card-section>
+        <q-card-section>
+          <div class="q-pa-md" >
+            <q-list bordered separator>
+              
+              <q-item clickable v-ripple @click="set_avatar('human_1')">
+                <q-item-section>
+                  <q-avatar>
+                    <img src="../assets/human_1.png">
+                  </q-avatar>
+                </q-item-section>
+              </q-item>
+
+              <q-item clickable v-ripple @click="set_avatar('human_2')">
+                <q-item-section>
+                  <q-avatar>
+                    <img src="../assets/human_2.png">
+                  </q-avatar>
+                </q-item-section>
+              </q-item>
+
+              <q-item clickable v-ripple @click="set_avatar('human_3')">
+                <q-item-section>
+                  <q-avatar>
+                    <img src="../assets/human_3.png">
+                  </q-avatar>
+                </q-item-section>
+              </q-item>
+
+              <q-item clickable v-ripple @click="set_avatar('human_4')">
+                <q-item-section>
+                  <q-avatar>
+                    <img src="../assets/human_4.png">
+                  </q-avatar>
+                </q-item-section>
+              </q-item>
+
+              <q-item clickable v-ripple @click="set_avatar('human_5')">
+                <q-item-section>
+                  <q-avatar>
+                    <img src="../assets/human_5.png">
+                  </q-avatar>
+                </q-item-section>
+              </q-item>
+
+            </q-list>
+          </div>
+        </q-card-section>
+
+        <q-separator />
+        <q-card-actions align="right">
+          <q-btn v-close-popup outline color="pink" label="Okay" />
+        </q-card-actions>
+      </q-card>
+    </q-dialog>
 
         </div>
 
@@ -241,12 +309,33 @@ export default defineComponent({
   data: function (){
     return {
       user_id: null,
+      avatar:'human_1',
       bot_avatar: 'default',
       is_updating: false,
       err_msg : '',
       is_failure: false,
       is_signed_in: false,
       is_loading: false,
+    }
+  },
+  computed: {
+    getHumanAvatarPath() {
+      var vm = this;
+      if (vm.is_loading){
+        return `${process.env.ICON_PATH}/white_square.png`;
+      } else {
+        if (vm.avatar === 'human_2') {
+          return `${process.env.ICON_PATH}/human_2.png`
+        } else if (vm.avatar === 'human_3'){
+          return `${process.env.ICON_PATH}/human_3.png`
+        } else if (vm.avatar === 'human_4'){
+          return `${process.env.ICON_PATH}/human_4.png`
+        } else if (vm.avatar === 'human_5'){
+          return `${process.env.ICON_PATH}/human_5.png`
+        } else {
+          return `${process.env.ICON_PATH}/human_1.png`
+        }
+      }
     }
   },
   created: function (){
@@ -282,6 +371,13 @@ export default defineComponent({
     },
   },
   methods: {
+    set_avatar:function(avatar_name){
+      console.log(avatar_name);
+      var vm = this;
+      vm.avatar = avatar_name;
+      vm.show_avatars = false;
+      vm.updateSettings();
+    },
     logout: function (){
       var vm = this;
       localStorage.removeItem('user_id');
@@ -297,6 +393,7 @@ export default defineComponent({
             //axios.post(`http://localhost:3000/users/${localStorage.user_id}/settings`, {
               axios.post(`${process.env.API}/users/${localStorage.user_id}/settings`, {
                     bot_avatar: vm.bot_avatar,
+                    avatar: vm.avatar,
                 },
                 {
                 headers: api_headers
@@ -330,7 +427,8 @@ export default defineComponent({
           .then(function (response) {
             // handle success
             console.log(response);
-            vm.bot_avatar = response.data.bot_avatar
+            vm.bot_avatar = response.data.bot_avatar;
+            vm.avatar = response.data.avatar;
           })
           .catch(function (error) {
             // handle error
@@ -349,6 +447,7 @@ export default defineComponent({
     return {
       essentialLinks: linksList,
       leftDrawerOpen,
+      show_avatars: ref(false),
       toggleLeftDrawer () {
         leftDrawerOpen.value = !leftDrawerOpen.value
       }
