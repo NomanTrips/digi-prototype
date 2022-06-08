@@ -4,28 +4,19 @@
       <q-toolbar
         class="bg-pink"
       >
-        <q-btn
-          flat
-          dense
-          round
-          icon="menu"
-          aria-label="Menu"
-          @click="toggleLeftDrawer"
-        />
 
         <q-toolbar-title>
           Digissist
         </q-toolbar-title>
-        <div style="padding:20px;">version 0.1</div>
         <div>
           <q-btn
             v-show="is_signed_in === false"
-            flat
-            dense
-            round
             icon="login"
             aria-label="login"
             to="/login"
+            label="Sign in"
+            outline
+            color="white"
           />
 
 
