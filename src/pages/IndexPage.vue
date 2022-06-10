@@ -62,6 +62,7 @@
             </q-avatar>            
           </template>
           </q-chat-message>
+
             <q-input
               v-model="user_input"
               outlined
@@ -70,11 +71,14 @@
               :disable="toggle_spinner"
               :placeholder="prompt_type == 'summarization' ? '[Insert Text Here]':''"
               placeholder-color="orange"
+              id="userinput"
             >
             <template v-slot:after>
             <q-btn round dense flat icon="send" @click="send_message"/>
             </template>
             </q-input>
+
+
   </div>
               </q-card-section>
                     <q-card-actions align="around">
@@ -144,7 +148,6 @@ import axios from "axios"
 import { v4 as uuidv4 } from 'uuid'
 import _ from "lodash"
 import { ref } from 'vue'
-
 
 export default defineComponent({
   name: 'IndexPage',
@@ -222,6 +225,15 @@ export default defineComponent({
       vm.getSettings();
     }
     vm.loadTemplate('Conversation');
+  
+  const log = document.getElementById('userinput');
+  document.addEventListener('keydown', logKey);
+  function logKey(e) {
+    if (e.code === 'Enter'){ // hack to send the message when hitting 'enter' since the input is a text area
+      vm.send_message();
+    }
+  }
+
   },
   mounted() {
 
@@ -289,6 +301,10 @@ export default defineComponent({
       } else {
         return `"${userinput}"`;
       }
+    },
+    logInput: function(){
+      var vm= this;
+      console.log(vm.user_input);
     },
     send_message: function (){
       var vm= this;
