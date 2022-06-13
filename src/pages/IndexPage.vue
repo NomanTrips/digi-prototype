@@ -231,7 +231,9 @@ export default defineComponent({
   document.addEventListener('keydown', logKey);
   function logKey(e) {
     if (e.code === 'Enter'){ // hack to send the message when hitting 'enter' since the input is a text area
-      vm.send_message();
+      if (vm.user_input != ""){
+        vm.send_message();
+      }
     }
   }
 
