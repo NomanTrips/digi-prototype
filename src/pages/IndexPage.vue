@@ -82,12 +82,14 @@
   </div>
               </q-card-section>
                     <q-card-actions align="around">
-        <q-btn outline color="pink" icon="edit_note" @click="card = true" >Edit prompt</q-btn>
-        <q-btn outline color="pink" icon="collections_bookmark" @click="radio">Prompt Templates</q-btn>
-        <q-btn outline color="pink" icon="settings" @click="show_settings = true">Settings</q-btn>
+                      <div class="row justify-center">
+                        <q-btn outline color="pink" icon="edit_note" @click="card = true" class="q-mx-xs">Edit prompt</q-btn>
+                        <q-btn outline color="pink" icon="collections_bookmark" @click="radio" class="q-mx-xs">Templates</q-btn>
+                        <q-btn outline color="pink" icon="settings" @click="show_settings = true" class="q-mx-xs"></q-btn>
+                      </div>
 
     <q-dialog v-model="card">
-      <q-card class="my-card">
+      <q-card class="my-card" style="width:400px;">
         <q-card-section>
           <div class="text-h6">Edit prompt text:</div>
         </q-card-section>
@@ -99,7 +101,6 @@
               color="pink"
               type="textarea"
               autogrow
-              style="width:500px;"
             />
           </div>
         </q-card-section>

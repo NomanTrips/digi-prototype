@@ -28,7 +28,7 @@
       icon="account_circle"
       @click="getSettings"
     >
-      <div class="row no-wrap q-pa-md" style="width:400px">
+      <div class="row no-wrap q-pa-md" style="width:375px">
         <div class="col-8">
           <div class="text-h6 q-mb-md">Choose AI skin:</div>
           <div v-show="is_updating">
@@ -417,7 +417,7 @@ export default defineComponent({
         axios.get(`${process.env.API}/users/${localStorage.user_id}/settings`)
           .then(function (response) {
             // handle success
-            console.log(response);
+            //console.log(response);
             vm.bot_avatar = response.data.bot_avatar;
             vm.avatar = response.data.avatar;
           })
