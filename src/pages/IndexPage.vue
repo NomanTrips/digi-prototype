@@ -45,7 +45,6 @@
         <q-card-section>
 
 
-
           <div  style="max-width: 500px">
           <q-chat-message
             style="font-style:italic;"
@@ -62,16 +61,15 @@
             </q-avatar>            
           </template>
           </q-chat-message>
-
             <q-input
               v-model="user_input"
               outlined
               color="pink"
               autogrow
-              :disable="toggle_spinner"
+              :disable="toggle_spinner || getTokenCount > 1024"
               :placeholder="prompt_type == 'summarization' ? '[Insert Text Here]':''"
               placeholder-color="orange"
-              id="userinput"
+              ref="userinput"
             >
             <template v-slot:after>
             <q-btn round dense flat icon="send" @click="send_message"/>
@@ -86,7 +84,17 @@
                         <q-btn outline color="pink" icon="edit_note" @click="card = true" class="q-mx-xs">Edit prompt</q-btn>
                         <q-btn outline color="pink" icon="collections_bookmark" @click="radio" class="q-mx-xs">Templates</q-btn>
                         <q-btn outline color="pink" icon="settings" @click="show_settings = true" class="q-mx-xs"></q-btn>
+                        <q-chip
+                          dense
+                          class="q-mx-xs"
+                          :color="getTokenCount > 1024 ? 'pink' : 'light-grey'"
+                          :text-color="getTokenCount > 1024 ? 'white' : 'black'"
+                        >
+                          {{getTokenCount}}/1024
+                        <q-tooltip >Token count</q-tooltip>
+                        </q-chip>
                       </div>
+
 
     <q-dialog v-model="card">
       <q-card class="my-card" style="width:400px;">
@@ -101,6 +109,7 @@
               color="pink"
               type="textarea"
               autogrow
+              @focus="user_input = ''"
             />
           </div>
         </q-card-section>
@@ -174,6 +183,7 @@ export default defineComponent({
       prompt_type: "generic_conversation",
       ai_model_engines: ['text-davinci-002', 'text-curie-001', 'text-babbage-001', 'text-ada-001'],
       ai_model_engine: 'text-davinci-002',
+      showTokenWarning: false,
       //user_setting:{
       //  bot_avatar: 'robot_1',
       //},
@@ -181,6 +191,10 @@ export default defineComponent({
   },
   computed: {
     // a computed getter
+    getTokenCount(){
+      var vm = this;
+      return vm.convo_template.length + vm.user_input.length;
+    },
     getBotAvatarPath() {
       var vm = this;
       if (vm.is_loading){
@@ -226,26 +240,26 @@ export default defineComponent({
       vm.getSettings();
     }
     vm.loadTemplate('Conversation');
-  
-  const log = document.getElementById('userinput');
-  document.addEventListener('keydown', logKey);
-  function logKey(e) {
-    if (e.code === 'Enter'){ // hack to send the message when hitting 'enter' since the input is a text area
-      if (vm.user_input != ""){
-        vm.send_message();
+    
+    //const log = document.getElementById('userinput'); this is broke... should be in mounted
+
+    document.addEventListener('keydown', logKey);
+    function logKey(e) {
+      //console.log(e);
+      if (e.code === 'Enter'){ // hack to send the message when hitting 'enter' since the input is a text area
+        if (vm.user_input != ""){
+          vm.send_message();
+        }
       }
     }
-  }
-
   },
   mounted() {
-
   },
   watch: {
     name(user_id) {
       console.log('watcher firing');
       localStorage.user_id = user_id;
-    }
+    },
   },
   methods: {
     radio: function (){
@@ -340,7 +354,8 @@ export default defineComponent({
           frequency_penalty: 0.0,
           presence_penalty: 0.6,
           stream: false,
-          logprobs: null
+          logprobs: null,
+          user: String(vm.user_id)
         },
          {
           headers: api_headers
