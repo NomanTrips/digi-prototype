@@ -70,9 +70,13 @@
               :placeholder="prompt_type == 'summarization' ? '[Insert Text Here]':''"
               placeholder-color="orange"
               ref="userinput"
+              :error="getTokenCount > 1024"
             >
             <template v-slot:after>
             <q-btn round dense flat icon="send" @click="send_message"/>
+            </template>
+            <template v-slot:error>
+              Token limit reached. Refresh the page to start a new conversation.
             </template>
             </q-input>
 
@@ -94,7 +98,6 @@
                         <q-tooltip >Token count</q-tooltip>
                         </q-chip>
                       </div>
-
 
     <q-dialog v-model="card">
       <q-card class="my-card" style="width:400px;">
@@ -193,7 +196,7 @@ export default defineComponent({
     // a computed getter
     getTokenCount(){
       var vm = this;
-      return vm.convo_template.length + vm.user_input.length;
+      return Math.round((vm.convo_template.length + vm.user_input.length)/4);
     },
     getBotAvatarPath() {
       var vm = this;
