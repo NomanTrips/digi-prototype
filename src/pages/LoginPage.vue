@@ -103,6 +103,7 @@ export default defineComponent({
                     if (response.status === 200){
                         console.log(`login resp data:  ${response.data}`)
                         localStorage.user_id = response.data.user_id;
+                        localStorage.token = response.data.token;
                         //vm.$root.$forceUpdate();
                         //console.log(vm.$parent.name);
                                                 //vm.$router.go();

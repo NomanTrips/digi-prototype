@@ -372,6 +372,7 @@ export default defineComponent({
     logout: function (){
       var vm = this;
       localStorage.removeItem('user_id');
+      localStorage.removeItem('token');
       vm.is_signed_in = false;
     },
     updateSettings: function (){
@@ -380,6 +381,7 @@ export default defineComponent({
           vm.is_updating = true;
           const api_headers = {
             'Content-Type': 'application/json',
+            'Authorization': "Bearer " + localStorage.token,
           }
             //axios.post(`http://localhost:3000/users/${localStorage.user_id}/settings`, {
               axios.post(`${process.env.API}/users/${localStorage.user_id}/settings`, {
@@ -403,6 +405,12 @@ export default defineComponent({
                     console.log(error);
                     vm.is_failure = true;
                     vm.err_msg = error;
+                    if (error.response.status == 403){
+                      localStorage.removeItem('user_id');
+                      localStorage.removeItem('token');
+                      vm.is_signed_in = false;
+                        vm.$router.push('/login');
+                      }
                 })
                 .then(function () {
                   // always executed
@@ -414,16 +422,27 @@ export default defineComponent({
       vm.is_loading = true;
       if (vm.is_signed_in){
         //axios.get(`http://localhost:3000/users/${localStorage.user_id}/settings`)  process.env.API
-        axios.get(`${process.env.API}/users/${localStorage.user_id}/settings`)
+        axios.get(`${process.env.API}/users/${localStorage.user_id}/settings`,
+          {
+            headers: {Authorization: "Bearer " + localStorage.token}
+          }
+          )
           .then(function (response) {
             // handle success
             //console.log(response);
+
             vm.bot_avatar = response.data.bot_avatar;
             vm.avatar = response.data.avatar;
           })
           .catch(function (error) {
             // handle error
             console.log(error);
+           if (error.response.status == 403){
+             localStorage.removeItem('user_id');
+             localStorage.removeItem('token');
+             vm.is_signed_in = false;
+              vm.$router.push('/login');
+            }
           })
           .then(function () {
             // always executed

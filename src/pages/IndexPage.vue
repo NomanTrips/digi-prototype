@@ -393,7 +393,11 @@ export default defineComponent({
       vm.is_loading = true;
       if (vm.is_signed_in){
         //axios.get(`http://localhost:3000/users/${localStorage.user_id}/settings`)
-        axios.get(`${process.env.API}/users/${localStorage.user_id}/settings`)
+        axios.get(`${process.env.API}/users/${localStorage.user_id}/settings`,
+          {
+            headers: {Authorization: "Bearer " + localStorage.token}
+          }
+          )
           .then(function (response) {
             // handle success
             vm.bot_avatar = response.data.bot_avatar;
@@ -402,6 +406,12 @@ export default defineComponent({
           .catch(function (error) {
             // handle error
             console.log(error);
+           if (error.response.status == 403){
+             localStorage.removeItem('user_id');
+             localStorage.removeItem('token');
+             vm.is_signed_in = false;
+             vm.$router.push('/login');
+            }
           })
           .then(function () {
             // always executed
