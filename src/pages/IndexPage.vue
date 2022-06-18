@@ -177,7 +177,7 @@ export default defineComponent({
       user_input: "",
       msg_sequence: 2,
       toggle_spinner: false,
-      user_id: 0,
+      user_id: 24, // free account tracking
       is_signed_in: true,
       avatar: 'human_1',
       bot_avatar: 'default',

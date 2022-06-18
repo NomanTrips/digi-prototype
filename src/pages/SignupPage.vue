@@ -185,6 +185,7 @@ export default defineComponent({
                     console.log(response);
                     if (response.status === 200){
                         localStorage.user_id = response.data.user_id;
+                        localStorage.token = response.data.token;
                         vm.$router.push('/')
                     } else{
                         vm.is_failure = true;
