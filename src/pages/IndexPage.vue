@@ -1,9 +1,9 @@
 <template>
 
-  <div class="q-pa-md row justify-center" >
+  <div class="q-pa-xs row justify-center" >
     <div style="width: 100%; max-width: 500px">
       <q-card class="my-card">
-        <q-card-section>
+        <q-card-section style="padding:10px;">
           <q-chat-message
             v-for="message in convo_json.messages"
             :key="message.messageId"
@@ -16,7 +16,7 @@
           >
 
           <template v-slot:avatar="props">
-            <q-avatar size="58px" :props="props" class="q-mx-xs" v-show="! is_loading">
+            <q-avatar :size="screenSize > 600 ? '58px':'48px'" :props="props" class="q-mx-xs" v-show="! is_loading">
               <img v-show="message.sender == 'AI'" :src="getBotAvatarPath">
               <img v-show="message.sender != 'AI'" :src="getHumanAvatarPath">
             </q-avatar>
@@ -42,7 +42,7 @@
          
         </q-card-section>
         <q-separator />
-        <q-card-section>
+        <q-card-section style="padding:8px;">
 
 
           <div  style="max-width: 500px">
@@ -56,7 +56,7 @@
             sent
           >
           <template v-slot:avatar>
-            <q-avatar size="58px" class="q-mx-xs">
+            <q-avatar :size="screenSize > 600 ? '58px':'38px'" class="q-mx-xs">
               <img :src="getHumanAvatarPath">
             </q-avatar>            
           </template>
@@ -71,9 +71,10 @@
               placeholder-color="orange"
               ref="userinput"
               :error="getTokenCount > 1024"
+              hide-bottom-space
             >
-            <template v-slot:after>
-            <q-btn round dense flat icon="send" @click="send_message"/>
+            <template v-slot:append>
+            <q-btn :size="screenSize > 600 ? 'md':'sm'" round dense flat icon="send" @click="send_message"/>
             </template>
             <template v-slot:error>
               Token limit reached. Refresh the page to start a new conversation.
@@ -85,17 +86,18 @@
               </q-card-section>
                     <q-card-actions align="around">
                       <div class="row justify-center">
-                        <q-btn outline color="pink" icon="edit_note" @click="card = true" class="q-mx-xs">Edit prompt</q-btn>
-                        <q-btn outline color="pink" icon="collections_bookmark" @click="radio" class="q-mx-xs">Templates</q-btn>
-                        <q-btn outline color="pink" icon="settings" @click="show_settings = true" class="q-mx-xs"></q-btn>
+                        <q-btn :size="screenSize > 600 ? 'md':'sm'" outline color="pink" icon="edit_note" @click="card = true" class="q-mx-xs">Edit prompt</q-btn>
+                        <q-btn :size="screenSize > 600 ? 'md':'sm'" outline color="pink" icon="collections_bookmark" @click="radio" class="q-mx-xs">Templates</q-btn>
+                        <q-btn :size="screenSize > 600 ? 'md':'sm'" outline color="pink" icon="settings" @click="show_settings = true" class="q-mx-xs"></q-btn>
                         <q-chip
                           dense
                           class="q-mx-xs"
                           :color="getTokenCount > 1024 ? 'pink' : 'light-grey'"
-                          :text-color="getTokenCount > 1024 ? 'white' : 'black'"
+                          :text-color="getTokenCount > 1024 ? 'white' : 'grey-6'"
+                          :size="screenSize > 600 ? 'md':'sm'"
                         >
                           {{getTokenCount}}/1024
-                        <q-tooltip >Token count</q-tooltip>
+                        <q-tooltip >Token limit</q-tooltip>
                         </q-chip>
                       </div>
 
@@ -194,6 +196,9 @@ export default defineComponent({
   },
   computed: {
     // a computed getter
+    screenSize(){
+      return this.$q.screen.width;
+    },
     getTokenCount(){
       var vm = this;
       return Math.round((vm.convo_template.length + vm.user_input.length)/4);
