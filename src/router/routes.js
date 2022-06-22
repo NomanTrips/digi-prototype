@@ -21,6 +21,20 @@ const routes = [
       { path: '', component: () => import('pages/SignupPage.vue') }
     ]
   },
+  {
+    path: '/resetpassword',
+    component: () => import('layouts/MainLayout.vue'),
+    children: [
+      { path: '', component: () => import('pages/ResetPassword.vue') }
+    ]
+  },
+  {
+    path: '/users/:user_id/changepassword/:token',
+    component: () => import('layouts/MainLayout.vue'),
+    children: [
+      { path: '', component: () => import('pages/ChangePassword.vue') }
+    ]
+  },
   // Always leave this as last one,
   // but you can also remove it
   {
