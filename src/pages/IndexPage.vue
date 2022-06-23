@@ -2,7 +2,7 @@
 
   <div class="q-pa-xs row justify-center" >
     <div style="width: 100%; max-width: 500px">
-      <q-card class="my-card">
+      <q-card class="my-card" style="padding-bottom:10px;" >
         <q-card-section style="padding:10px;">
           <q-chat-message
             v-for="message in convo_json.messages"
@@ -86,12 +86,12 @@
               </q-card-section>
                     <q-card-actions align="around">
                       <div class="row justify-center">
-                        <q-btn :size="screenSize > 600 ? 'md':'sm'" outline color="pink" icon="edit_note" @click="card = true" class="q-mx-xs">Edit prompt</q-btn>
-                        <q-btn :size="screenSize > 600 ? 'md':'sm'" outline color="pink" icon="collections_bookmark" @click="radio" class="q-mx-xs">Templates</q-btn>
-                        <q-btn :size="screenSize > 600 ? 'md':'sm'" outline color="pink" icon="settings" @click="show_settings = true" class="q-mx-xs"></q-btn>
+                        <q-btn :size="screenSize > 600 ? 'md':'sm'" outline color="pink" icon="edit_note" @click="card = true" class="q-mx-xs q-mb-md">Edit prompt</q-btn>
+                        <q-btn :size="screenSize > 600 ? 'md':'sm'" outline color="pink" icon="collections_bookmark" @click="radio" class="q-mx-xs q-mb-md">Templates</q-btn>
+                        <q-btn :size="screenSize > 600 ? 'md':'sm'" outline color="pink" icon="settings" @click="show_settings = true" class="q-mx-xs q-mb-md"></q-btn>
                         <q-chip
                           dense
-                          class="q-mx-xs"
+                          class="q-mx-xs q-mb-md"
                           :color="getTokenCount > 1024 ? 'pink' : 'light-grey'"
                           :text-color="getTokenCount > 1024 ? 'white' : 'grey-6'"
                           :size="screenSize > 600 ? 'md':'sm'"
@@ -256,6 +256,7 @@ export default defineComponent({
       //console.log(e);
       if (e.code === 'Enter'){ // hack to send the message when hitting 'enter' since the input is a text area
         if (vm.user_input != ""){
+          vm.$refs.userinput.blur();
           vm.send_message();
         }
       }
