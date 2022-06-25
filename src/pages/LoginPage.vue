@@ -104,9 +104,10 @@ export default defineComponent({
                 .then(function (response) {
                     console.log(response);
                     if (response.status === 200){
-                        console.log(`login resp data:  ${response.data}`)
+                        console.log(`login resp data:  ${response.data}`);
                         localStorage.user_id = response.data.user_id;
                         localStorage.token = response.data.token;
+                        localStorage.username = response.data.username;
                         //vm.$root.$forceUpdate();
                         //console.log(vm.$parent.name);
                                                 //vm.$router.go();

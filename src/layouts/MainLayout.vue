@@ -134,7 +134,7 @@
 
 
           <div >
-            <div class="text-subtitle1 q-mt-md q-mb-xs">{{user_id}}</div>
+            <div class="text-subtitle1 q-mt-md q-mb-xs">{{username}}</div>
             <q-btn
               color="pink"
               label="Logout"
@@ -299,6 +299,7 @@ export default defineComponent({
   },
   data: function (){
     return {
+      username: null,
       user_id: null,
       avatar:'human_1',
       bot_avatar: 'default',
@@ -333,8 +334,9 @@ export default defineComponent({
     //console.log(`masthead create`)
     var vm = this; // vm = view model, the vue instance
     if (localStorage.user_id) {
-      this.user_id = localStorage.user_id;
-      this.is_signed_in = true;
+      vm.user_id = localStorage.user_id;
+      vm.is_signed_in = true;
+      vm.username = localStorage.username;
     }
   },
   mounted() {
@@ -373,6 +375,7 @@ export default defineComponent({
       var vm = this;
       localStorage.removeItem('user_id');
       localStorage.removeItem('token');
+      localStorage.removeItem('username');
       vm.is_signed_in = false;
     },
     updateSettings: function (){

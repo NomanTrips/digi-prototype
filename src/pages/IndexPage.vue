@@ -148,6 +148,36 @@
       </q-card>
     </q-dialog>
 
+<!--
+    <q-dialog v-model="show_templates">
+      <q-card class="my-card" style="width:400px;">
+        <q-card-section>
+          <div class="text-h6">Choose a prompt template:</div>
+        </q-card-section>
+        <q-card-section>
+          <div>
+            <q-list bordered separator>
+
+            <q-item tag="label" v-ripple :v-for="template in templates">
+              <q-item-section avatar>
+                <q-radio v-model="selected_template" :val="template.value" color="pink" />
+              </q-item-section>
+              <q-item-section>
+                <q-item-label>{{template.label}}</q-item-label>
+              </q-item-section>
+            </q-item>
+              
+            </q-list>
+          </div>
+        </q-card-section>
+
+        <q-separator />
+        <q-card-actions align="right">
+          <q-btn v-close-popup outline color="pink" label="Okay" />
+        </q-card-actions>
+      </q-card>
+    </q-dialog>
+-->
       </q-card-actions>
     </q-card>
     </div>
@@ -182,13 +212,19 @@ export default defineComponent({
       user_id: 24, // free account tracking
       is_signed_in: true,
       avatar: 'human_1',
-      bot_avatar: 'default',
+      bot_avatar: 'owley',
       is_loading: false,
       message_prefix: "",
       prompt_type: "generic_conversation",
       ai_model_engines: ['text-davinci-002', 'text-curie-001', 'text-babbage-001', 'text-ada-001'],
       ai_model_engine: 'text-davinci-002',
       showTokenWarning: false,
+      templates: [
+            { label: 'Generic conversation (default)', value: 'generic_conversation', color: 'pink' },
+            { label: 'Summarization - into one sentance', value: 'summarization', color: 'pink' },
+            { label: 'Summarization', value: 'summarization_long', color: 'pink' },
+            { label: 'Summarization - software development', value: 'summarization_dev', color: 'pink' },
+          ],
       //user_setting:{
       //  bot_avatar: 'robot_1',
       //},
@@ -212,12 +248,12 @@ export default defineComponent({
           return `${process.env.ICON_PATH}/green_spark.png`
         } else if (vm.bot_avatar === 'penguin'){
           return `${process.env.ICON_PATH}/penguin.png`
-        } else if (vm.bot_avatar === 'owley'){
-          return `${process.env.ICON_PATH}/owley.png`
+        } else if (vm.bot_avatar === 'default'){
+          return `${process.env.ICON_PATH}/default.png`
         } else if (vm.bot_avatar === 'diaspora'){
           return `${process.env.ICON_PATH}/diaspora.png`
-        } else {
-          return `${process.env.ICON_PATH}/default.png`
+        } else {         
+          return `${process.env.ICON_PATH}/owley.png`
         }
       }
     },
