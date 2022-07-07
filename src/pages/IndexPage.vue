@@ -87,7 +87,7 @@
                     <q-card-actions align="around">
                       <div class="row justify-center">
                         <q-btn :size="screenSize > 600 ? 'md':'sm'" outline color="pink" icon="edit_note" @click="card = true" class="q-mx-xs q-mb-md">Edit prompt</q-btn>
-                        <q-btn :size="screenSize > 600 ? 'md':'sm'" outline color="pink" icon="collections_bookmark" @click="radio" class="q-mx-xs q-mb-md">Templates</q-btn>
+                        <q-btn :size="screenSize > 600 ? 'md':'sm'" outline color="pink" icon="collections_bookmark" @click="show_templates = true" class="q-mx-xs q-mb-md">Templates</q-btn>
                         <q-btn :size="screenSize > 600 ? 'md':'sm'" outline color="pink" icon="settings" @click="show_settings = true" class="q-mx-xs q-mb-md"></q-btn>
                         <q-chip
                           dense
@@ -148,7 +148,6 @@
       </q-card>
     </q-dialog>
 
-<!--
     <q-dialog v-model="show_templates">
       <q-card class="my-card" style="width:400px;">
         <q-card-section>
@@ -158,7 +157,7 @@
           <div>
             <q-list bordered separator>
 
-            <q-item tag="label" v-ripple :v-for="template in templates">
+            <q-item tag="label" v-ripple v-for="template in templates" :key="template.value">
               <q-item-section avatar>
                 <q-radio v-model="selected_template" :val="template.value" color="pink" />
               </q-item-section>
@@ -177,7 +176,7 @@
         </q-card-actions>
       </q-card>
     </q-dialog>
--->
+
       </q-card-actions>
     </q-card>
     </div>
@@ -209,7 +208,7 @@ export default defineComponent({
       user_input: "",
       msg_sequence: 2,
       toggle_spinner: false,
-      user_id: 24, // free account tracking
+      user_id: 24, // free account user id
       is_signed_in: true,
       avatar: 'human_1',
       bot_avatar: 'owley',
@@ -225,6 +224,7 @@ export default defineComponent({
             { label: 'Summarization', value: 'summarization_long', color: 'pink' },
             { label: 'Summarization - software development', value: 'summarization_dev', color: 'pink' },
           ],
+      selected_template: 'generic_conversation',
       //user_setting:{
       //  bot_avatar: 'robot_1',
       //},
@@ -301,39 +301,17 @@ export default defineComponent({
   mounted() {
   },
   watch: {
+    selected_template(new_template){
+      var vm = this;
+      vm.loadTemplate(new_template);
+      vm.show_templates = false;  
+    },
     name(user_id) {
       console.log('watcher firing');
       localStorage.user_id = user_id;
     },
   },
   methods: {
-    radio: function (){
-      var vm = this;
-      this.$q.dialog({
-        title: 'Choose a prompt template:',
-        //message: 'Choose a prompt template:',
-        options: {
-          type: 'radio',
-          model: 'opt1',
-          // inline: true
-          items: [
-            { label: 'Generic conversation (default)', value: 'generic_conversation', color: 'pink' },
-            { label: 'Summarization - into one sentance', value: 'summarization', color: 'pink' },
-            { label: 'Summarization', value: 'summarization_long', color: 'pink' },
-            { label: 'Summarization - software development', value: 'summarization_dev', color: 'pink' },
-          ]
-        },
-        cancel: true,
-        persistent: true
-      }).onOk(data => {
-         //console.log('>>>> OK, received', data);
-         vm.loadTemplate(data);
-      }).onCancel(() => {
-         console.log('>>>> Cancel')
-      }).onDismiss(() => {
-        // console.log('I am triggered on both OK and Cancel')
-      })
-    },
     loadTemplate: function (template_name) {
       var vm = this;
       if (template_name === 'generic_conversation'){
@@ -466,6 +444,7 @@ export default defineComponent({
     return {
       card: ref(false),
       show_settings: ref(false),
+      show_templates: ref(false),
     }
    }
 })
