@@ -44,17 +44,22 @@
                 lazy-rules
                 :rules="[
                 val => val !== null && val !== '' || 'Please type your password',
+                val => val.length >= 8 || 'Password must be at least 8 characters long.',
+                val => val.match(/\W|_/g) != null || 'Password must contain at least one special character.', // at least 1 spec char
+                val => val.match(/\d+/g) != null || 'Password must contain at least one number.', // at least 1 number
+                val => val.match(/[a-zA-Z]/) != null || 'Password must contain at least letter.', // at least 1 letter
                 ]"
             >
               <template v-slot:append>
+                
                 <q-icon
                   :name="isPwd ? 'visibility_off' : 'visibility'"
                   class="cursor-pointer"
                   @click="isPwd = !isPwd"
                 />
               </template>
-            </q-input>
 
+            </q-input>
             <q-input
                 filled
                 :type="isPwd ? 'password' : 'text'"
@@ -65,7 +70,7 @@
                 lazy-rules
                 :rules="[
                 val => val !== null && val !== '' || 'Please re-type your password',
-                retyped_password === password
+                val => val === password || 'Password does not match.',
                 ]"
             >
               <template v-slot:append>
