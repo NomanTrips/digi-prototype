@@ -183,7 +183,7 @@
                     </q-tooltip>
                     <template v-slot:hint>
                       <div style="color: goldenrod">
-                        Premium users get access to Davinci
+                        Sign up for Premium to talk to Davinci!
                       </div>
                     </template>
                   </q-select>

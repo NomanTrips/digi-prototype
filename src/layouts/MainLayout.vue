@@ -2,24 +2,41 @@
   <q-layout view="lHh Lpr lFf">
     <q-header elevated>
       <q-toolbar class="bg-pink">
-        <q-toolbar-title> Digissist </q-toolbar-title>
+        <q-toolbar-title>
+          <router-link to="/" style="text-decoration: none; color: white"
+            >Digissist</router-link
+          >
+        </q-toolbar-title>
         <div>
           <q-btn
             v-show="is_signed_in === false"
             icon="login"
             aria-label="login"
             to="/login"
-            label="Sign in"
+            label="Login"
             outline
             color="white"
+            :size="screenSize > 600 ? 'sm' : 'xs'"
+            class="q-mx-xs"
           />
 
+          <q-btn
+            v-show="is_signed_in === false"
+            aria-label="signup"
+            to="/signup"
+            label="Sign up"
+            outline
+            color="white"
+            :size="screenSize > 600 ? 'sm' : 'xs'"
+            class="q-mx-xs"
+          >
+          </q-btn>
           <q-btn-dropdown
             v-show="is_signed_in === true"
             outline
             color="white"
-            fab-mini
             icon="account_circle"
+            :size="screenSize > 600 ? 'sm' : 'xs'"
             @click="getSettings"
           >
             <div class="row no-wrap q-pa-sm" style="width: 400px">
@@ -193,7 +210,16 @@
               </div>
             </div>
           </q-btn-dropdown>
-
+          <q-btn
+            outline
+            style="color: white; background-color: white"
+            label="Go Premium"
+            v-close-popup
+            to="/upgrade"
+            size="sm"
+            class="q-mx-xs"
+            v-show="is_signed_in && !premium_tf"
+          />
           <q-dialog v-model="show_avatars">
             <q-card class="my-card" style="width: 400px">
               <q-card-section>
@@ -266,6 +292,26 @@
         />
       </q-list>
     </q-drawer>
+
+    <q-dialog v-model="show_signup_hint" seamless>
+      <q-card style="width: 160px; position: absolute; right: 25px; top: 40px">
+        <q-linear-progress :value="prompt_progress" color="amber" />
+
+        <div class="row items-center no-wrap q-ma-xs">
+          <div>
+            <div style="font-size: 10px">
+              {{ signup_hint }}
+            </div>
+          </div>
+          <div>
+            <q-icon name="arrow_upward" size="14px" />
+          </div>
+          <q-space />
+
+          <q-btn size="xs" flat round icon="close" v-close-popup />
+        </div>
+      </q-card>
+    </q-dialog>
 
     <q-page-container>
       <router-view />
@@ -342,9 +388,16 @@ export default defineComponent({
       is_loading: false,
       subscription_status: "",
       premium_tf: false,
+      show_signup_hint: false,
+      prompt_progress: 0.0,
+      intervalID: null,
+      signup_hint: "",
     };
   },
   computed: {
+    screenSize() {
+      return this.$q.screen.width;
+    },
     account_tier() {
       var vm = this;
       if (vm.premium_tf) {
@@ -384,6 +437,21 @@ export default defineComponent({
     if (localStorage.premium_tf === "true") {
       vm.premium_tf = true;
     }
+
+    if (vm.$router.currentRoute._value.path === "/") {
+      // only show the hint on the main page
+      if (!vm.is_signed_in) {
+        vm.signup_hint = "Sign up to pick an AI skin!";
+        setTimeout(() => {
+          vm.prompt_timer();
+        }, 10000);
+      } else if (!vm.premium_tf) {
+        vm.signup_hint = "Go Premium to talk to a smarter AI!";
+        setTimeout(() => {
+          vm.prompt_timer();
+        }, 10000);
+      }
+    }
   },
   mounted() {
     //console.log(`the masthead is now mounted.`)
@@ -399,6 +467,15 @@ export default defineComponent({
     }
   },
   watch: {
+    prompt_progress(value) {
+      var vm = this;
+      if (value > 1) {
+        clearInterval(vm.intervalID);
+        setTimeout(() => {
+          vm.show_signup_hint = false;
+        }, 2000);
+      }
+    },
     bot_avatar(old_avatar, new_avatar) {
       var vm = this;
       if (vm.is_loading === false && new_avatar != old_avatar) {
@@ -410,6 +487,14 @@ export default defineComponent({
     },
   },
   methods: {
+    prompt_timer: function () {
+      var vm = this;
+      vm.show_signup_hint = true;
+      var incrementProgress = function () {
+        vm.prompt_progress = vm.prompt_progress + 0.05;
+      };
+      vm.intervalID = setInterval(incrementProgress, 200);
+    },
     get_billing_details: function () {
       var vm = this;
       if (localStorage.user_id === undefined) {
@@ -450,6 +535,7 @@ export default defineComponent({
       localStorage.removeItem("username");
       localStorage.removeItem("premium_tf");
       vm.is_signed_in = false;
+      window.location.reload();
     },
     updateSettings: function () {
       var vm = this;
