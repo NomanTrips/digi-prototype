@@ -31,6 +31,16 @@
             class="q-mx-xs"
           >
           </q-btn>
+          <q-btn
+            outline
+            style="color: white; background-color: white"
+            label="Go Premium"
+            v-close-popup
+            to="/upgrade"
+            :size="screenSize > 600 ? 'sm' : 'xs'"
+            class="q-mx-xs"
+            v-show="is_signed_in && !premium_tf"
+          />
           <q-btn-dropdown
             v-show="is_signed_in === true"
             outline
@@ -47,7 +57,7 @@
                   <q-spinner color="pink" size="2em" />
                 </div>
 
-                <q-list>
+                <q-list dense>
                   <!--
         Rendering a <label> tag (notice tag="label")
         so QRadios will respond to clicks on QItems to
@@ -166,8 +176,9 @@
                   {{ account_tier }}
                 </div>
 
-                <div style="margin-top: 100px">
-                  <div class="row justify-center q-ma-md">
+                <div style="margin-top: 140px">
+                  <!--
+                  <div class="row justify-center q-ma-md">                   
                     <q-btn
                       outline
                       style="color: goldenrod; width: 108px"
@@ -179,6 +190,7 @@
                       v-show="!premium_tf"
                     />
                   </div>
+                  -->
                   <div class="row justify-center q-ma-md">
                     <q-btn
                       color="pink"
@@ -210,16 +222,7 @@
               </div>
             </div>
           </q-btn-dropdown>
-          <q-btn
-            outline
-            style="color: white; background-color: white"
-            label="Go Premium"
-            v-close-popup
-            to="/upgrade"
-            size="sm"
-            class="q-mx-xs"
-            v-show="is_signed_in && !premium_tf"
-          />
+
           <q-dialog v-model="show_avatars">
             <q-card class="my-card" style="width: 400px">
               <q-card-section>
@@ -299,13 +302,14 @@
 
         <div class="row items-center no-wrap q-ma-xs">
           <div>
+            <q-icon name="arrow_upward" size="14px" />
+          </div>
+          <div>
             <div style="font-size: 10px">
               {{ signup_hint }}
             </div>
           </div>
-          <div>
-            <q-icon name="arrow_upward" size="14px" />
-          </div>
+
           <q-space />
 
           <q-btn size="xs" flat round icon="close" v-close-popup />

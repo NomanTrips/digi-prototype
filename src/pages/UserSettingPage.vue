@@ -40,12 +40,25 @@
               &nbsp; {{ account_tier }}
             </div>
           </div>
-
           <div class="row justify-center text-body1 q-ma-md">
             <b>Subscription status:</b> &nbsp;{{ subscription_status }}
           </div>
+
+          <div class="row justify-center text-subtitle1 q-mt-md q-mb-xs">
+            <b>AI avatar:</b>
+          </div>
+          <div class="row justify-center text-subtitle1 q-mb-xs">
+            <q-btn round @click="show_ai_avatars = true">
+              <q-avatar size="64px">
+                <img :src="getBotAvatarPath" />
+              </q-avatar>
+              <q-tooltip> Pick an AI Avatar </q-tooltip>
+            </q-btn>
+          </div>
+
           <div class="row justify-center q-ma-md">
             <q-btn
+              v-show="is_stripe_customer"
               color="pink"
               outline
               v-close-popup
@@ -116,6 +129,99 @@
       </q-card-actions>
     </q-card>
   </q-dialog>
+
+  <q-dialog v-model="show_ai_avatars">
+    <q-card class="my-card" style="width: 400px">
+      <q-card-section>
+        <div class="text-h6">Choose AI skin:</div>
+      </q-card-section>
+      <q-card-section>
+        <div>
+          <div v-show="is_updating">
+            Saving...
+            <q-spinner color="pink" size="2em" />
+          </div>
+
+          <q-list>
+            <q-item :disable="is_updating" tag="label" v-ripple>
+              <q-item-section avatar>
+                <q-radio v-model="bot_avatar" val="default" color="pink" />
+              </q-item-section>
+              <q-item-section>
+                <q-item-label>default</q-item-label>
+              </q-item-section>
+              <q-item-section>
+                <q-avatar>
+                  <img src="../assets/default.png" />
+                </q-avatar>
+              </q-item-section>
+            </q-item>
+
+            <q-item :disable="is_updating" tag="label" v-ripple>
+              <q-item-section avatar>
+                <q-radio v-model="bot_avatar" val="green_spark" color="pink" />
+              </q-item-section>
+              <q-item-section>
+                <q-item-label>green spark</q-item-label>
+              </q-item-section>
+              <q-item-section>
+                <q-avatar>
+                  <img src="../assets/green_spark.png" />
+                </q-avatar>
+              </q-item-section>
+            </q-item>
+
+            <q-item :disable="is_updating" tag="label" v-ripple>
+              <q-item-section avatar>
+                <q-radio v-model="bot_avatar" val="penguin" color="pink" />
+              </q-item-section>
+              <q-item-section>
+                <q-item-label>penguin</q-item-label>
+              </q-item-section>
+              <q-item-section>
+                <q-avatar>
+                  <img src="../assets/penguin.png" />
+                </q-avatar>
+              </q-item-section>
+            </q-item>
+
+            <q-item :disable="is_updating" tag="label" v-ripple>
+              <q-item-section avatar>
+                <q-radio v-model="bot_avatar" val="owley" color="pink" />
+              </q-item-section>
+              <q-item-section>
+                <q-item-label>owley</q-item-label>
+              </q-item-section>
+              <q-item-section>
+                <q-avatar>
+                  <img src="../assets/owley.png" />
+                </q-avatar>
+              </q-item-section>
+            </q-item>
+
+            <q-item :disable="is_updating" tag="label" v-ripple>
+              <q-item-section avatar>
+                <q-radio v-model="bot_avatar" val="diaspora" color="pink" />
+              </q-item-section>
+              <q-item-section>
+                <q-item-label>diaspora</q-item-label>
+              </q-item-section>
+              <q-item-section>
+                <q-avatar>
+                  <img src="../assets/diaspora.png" />
+                </q-avatar>
+              </q-item-section>
+            </q-item>
+          </q-list>
+        </div>
+      </q-card-section>
+
+      <q-separator />
+      <q-card-actions align="right">
+        <q-btn v-close-popup outline color="pink" label="Okay" />
+      </q-card-actions>
+    </q-card>
+  </q-dialog>
 </template>
 
 <script>
@@ -129,7 +235,7 @@ export default defineComponent({
       username: null,
       user_id: null,
       avatar: "human_1",
-      bot_avatar: "default",
+      bot_avatar: "owley",
       is_updating: false,
       err_msg: "",
       is_failure: false,
@@ -138,6 +244,8 @@ export default defineComponent({
       stripe_customer_id: null,
       subscription_status: "",
       premium_tf: false,
+      show_ai_avatars: false,
+      is_stripe_customer: false,
     };
   },
   computed: {
@@ -147,6 +255,24 @@ export default defineComponent({
         return "Premium";
       } else {
         return "Free tier";
+      }
+    },
+    getBotAvatarPath() {
+      var vm = this;
+      if (vm.is_loading) {
+        return `${process.env.ICON_PATH}/white_square.png`;
+      } else {
+        if (vm.bot_avatar === "green_spark") {
+          return `${process.env.ICON_PATH}/green_spark.png`;
+        } else if (vm.bot_avatar === "penguin") {
+          return `${process.env.ICON_PATH}/penguin.png`;
+        } else if (vm.bot_avatar === "default") {
+          return `${process.env.ICON_PATH}/default.png`;
+        } else if (vm.bot_avatar === "diaspora") {
+          return `${process.env.ICON_PATH}/diaspora.png`;
+        } else {
+          return `${process.env.ICON_PATH}/owley.png`;
+        }
       }
     },
     getHumanAvatarPath() {
@@ -181,6 +307,14 @@ export default defineComponent({
       vm.premium_tf = true;
     }
   },
+  watch: {
+    bot_avatar(old_avatar, new_avatar) {
+      var vm = this;
+      if (vm.is_loading === false && new_avatar != old_avatar) {
+        vm.updateSettings();
+      }
+    },
+  },
   methods: {
     get_billing_details: function () {
       var vm = this;
@@ -189,6 +323,9 @@ export default defineComponent({
         .then(function (response) {
           console.log(response);
           vm.stripe_customer_id = response.data.stripe_customer_id;
+          if (vm.stripe_customer_id != undefined) {
+            vm.is_stripe_customer = true;
+          }
           vm.subscription_status = response.data.subscription_status;
           if (vm.subscription_status === null) {
             vm.subscription_status = "N/A";

@@ -1,7 +1,7 @@
 <template>
   <div class="q-pa-xs row justify-center">
     <div style="width: 100%; max-width: 500px">
-      <q-card class="my-card" style="padding-bottom: 10px">
+      <q-card class="my-card" style="margin-bottom: 15px">
         <q-card-section style="padding: 10px">
           <q-chat-message
             v-for="message in convo_json.messages"
