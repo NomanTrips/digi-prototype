@@ -67,13 +67,13 @@
               outlined
               color="pink"
               autogrow
-              :disable="toggle_spinner || getTokenCount > 1024"
+              :disable="toggle_spinner || is_error"
               :placeholder="
                 prompt_type == 'summarization' ? '[Insert Text Here]' : ''
               "
               placeholder-color="orange"
               ref="userinput"
-              :error="getTokenCount > 1024"
+              :error="is_error"
               hide-bottom-space
             >
               <template v-slot:append>
@@ -87,8 +87,7 @@
                 />
               </template>
               <template v-slot:error>
-                Token limit reached. Refresh the page to start a new
-                conversation.
+                {{ error_message }}
               </template>
             </q-input>
           </div>
@@ -301,6 +300,8 @@ export default defineComponent({
       ],
       selected_template: "generic_conversation",
       premium_tf: false,
+      error_message: "",
+      is_error: false,
       //user_setting:{
       //  bot_avatar: 'robot_1',
       //},
@@ -390,6 +391,14 @@ export default defineComponent({
   },
   mounted() {},
   watch: {
+    getTokenCount(count) {
+      var vm = this;
+      if (count > 1024) {
+        vm.is_error = true;
+        vm.error_message =
+          "Token limit reached. Refresh the page to start a new conversation.";
+      }
+    },
     selected_template(new_template) {
       var vm = this;
       vm.loadTemplate(new_template);
@@ -502,10 +511,21 @@ export default defineComponent({
         })
         .catch(function (error) {
           console.log(error);
-          vm.toggle_spinner = false;
+          if (error.response.status === 429) {
+            // too many requests to the api
+            vm.error_message = error.response.data;
+            vm.is_error = true;
+          } else if (error.response.status === 500) {
+            if (error.response.data === "Unsafe content") {
+              vm.error_message =
+                "Unsafe content was detected by the content filter. This could include profanity or hateful language. Please refresh the page to try again.";
+              vm.is_error = true;
+            }
+          }
         })
         .then(function () {
           // always executed
+          vm.toggle_spinner = false;
           vm.prompt_type = "generic_conversation"; // even if coming from summarization task, set to genric after to continue w additional questions
           vm.message_prefix = "";
         });
