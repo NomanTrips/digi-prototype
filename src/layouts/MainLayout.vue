@@ -99,7 +99,7 @@
                       </q-avatar>
                     </q-item-section>
                   </q-item>
-
+                  <!--
                   <q-item :disable="is_updating" tag="label" v-ripple>
                     <q-item-section avatar>
                       <q-radio
@@ -117,7 +117,7 @@
                       </q-avatar>
                     </q-item-section>
                   </q-item>
-
+-->
                   <q-item :disable="is_updating" tag="label" v-ripple>
                     <q-item-section avatar>
                       <q-radio v-model="bot_avatar" val="owley" color="pink" />
@@ -131,7 +131,7 @@
                       </q-avatar>
                     </q-item-section>
                   </q-item>
-
+                  <!--
                   <q-item :disable="is_updating" tag="label" v-ripple>
                     <q-item-section avatar>
                       <q-radio
@@ -146,6 +146,66 @@
                     <q-item-section>
                       <q-avatar>
                         <img src="../assets/diaspora.png" />
+                      </q-avatar>
+                    </q-item-section>
+                  </q-item>
+
+                  <q-item :disable="is_updating" tag="label" v-ripple>
+                    <q-item-section avatar>
+                      <q-radio
+                        v-model="bot_avatar"
+                        val="big_un"
+                        color="amber"
+                        :disable="!premium_tf"
+                      />
+                    </q-item-section>
+                    <q-item-section style="color: goldenrod">
+                      <q-item-label>big 'un</q-item-label>
+                      <q-item-label caption><i>Premium</i></q-item-label>
+                    </q-item-section>
+                    <q-item-section>
+                      <q-avatar>
+                        <img src="../assets/big_un.png" />
+                      </q-avatar>
+                    </q-item-section>
+                  </q-item>
+-->
+                  <q-item :disable="is_updating" tag="label" v-ripple>
+                    <q-item-section avatar>
+                      <q-radio
+                        v-model="bot_avatar"
+                        val="mantis"
+                        color="amber"
+                        :disable="!premium_tf"
+                      />
+                    </q-item-section>
+                    <q-item-section style="color: goldenrod">
+                      <q-item-label>mantis</q-item-label>
+                      <q-item-label caption><i>Premium</i></q-item-label>
+                    </q-item-section>
+                    <q-item-section>
+                      <q-avatar>
+                        <img src="../assets/mantis.png" />
+                      </q-avatar>
+                    </q-item-section>
+                  </q-item>
+
+                  <q-item :disable="is_updating" tag="label" v-ripple>
+                    <q-item-section avatar>
+                      <q-radio
+                        v-model="bot_avatar"
+                        val="orphan"
+                        color="amber"
+                        :disable="!premium_tf"
+                      />
+                    </q-item-section>
+                    <q-item-section style="color: goldenrod">
+                      <q-item-label>orphan</q-item-label>
+                      <q-item-label caption><i>Premium</i></q-item-label>
+                    </q-item-section>
+                    <q-item-section>
+                      <q-avatar>
+                        <img src="../assets/orphan.png" />
                       </q-avatar>
                     </q-item-section>
                   </q-item>

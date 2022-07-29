@@ -329,6 +329,12 @@ export default defineComponent({
           return `${process.env.ICON_PATH}/default.png`;
         } else if (vm.bot_avatar === "diaspora") {
           return `${process.env.ICON_PATH}/diaspora.png`;
+        } else if (vm.bot_avatar === "big_un") {
+          return `${process.env.ICON_PATH}/big_un.png`;
+        } else if (vm.bot_avatar === "mantis") {
+          return `${process.env.ICON_PATH}/mantis.png`;
+        } else if (vm.bot_avatar === "orphan") {
+          return `${process.env.ICON_PATH}/orphan.png`;
         } else {
           return `${process.env.ICON_PATH}/owley.png`;
         }
