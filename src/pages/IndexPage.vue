@@ -47,9 +47,9 @@
             <q-chat-message
               style="font-style: italic"
               size="10"
-              v-show="prompt_type == 'summarization'"
+              v-show="show_prefix"
               name="Human"
-              :text="[message_prefix]"
+              :text="[selected_template.prefix]"
               text-color="grey-7"
               sent
             >
@@ -68,10 +68,7 @@
               color="pink"
               autogrow
               :disable="toggle_spinner || is_error"
-              :placeholder="
-                prompt_type == 'summarization' ? '[Insert Text Here]' : ''
-              "
-              placeholder-color="orange"
+              :placeholder="show_prefix ? '[Insert Text Here]' : ''"
               ref="userinput"
               :error="is_error"
               hide-bottom-space
@@ -107,10 +104,10 @@
               :size="screenSize > 600 ? 'md' : 'sm'"
               outline
               color="pink"
-              icon="collections_bookmark"
+              icon="psychology"
               @click="show_templates = true"
               class="q-mx-xs q-mb-md"
-              >Templates</q-btn
+              >Tasks</q-btn
             >
             <q-btn
               :size="screenSize > 600 ? 'md' : 'sm'"
@@ -140,7 +137,7 @@
               <q-card-section>
                 <div>
                   <q-input
-                    v-model="convo_template"
+                    v-model="selected_template.text"
                     outlined
                     color="pink"
                     type="textarea"
@@ -199,20 +196,61 @@
           <q-dialog v-model="show_templates">
             <q-card class="my-card" style="width: 400px">
               <q-card-section>
-                <div class="text-h6">Choose a prompt template:</div>
+                <div class="text-h6">Choose a task:</div>
               </q-card-section>
               <q-card-section>
                 <div>
-                  <q-list bordered separator>
+                  <q-list bordered separator dense>
+                    <q-item-label header>General</q-item-label>
                     <q-item
                       tag="label"
                       v-ripple
-                      v-for="template in templates"
+                      v-for="template in conversation_templates"
                       :key="template.value"
                     >
                       <q-item-section avatar>
                         <q-radio
-                          v-model="selected_template"
+                          v-model="selected_template_key"
+                          :val="template.value"
+                          color="pink"
+                        />
+                      </q-item-section>
+                      <q-item-section>
+                        <q-item-label>{{ template.label }}</q-item-label>
+                      </q-item-section>
+                    </q-item>
+
+                    <q-separator />
+                    <q-item-label header>Internet tasks</q-item-label>
+                    <q-item
+                      tag="label"
+                      v-ripple
+                      v-for="template in internet_task_templates"
+                      :key="template.value"
+                    >
+                      <q-item-section avatar>
+                        <q-radio
+                          v-model="selected_template_key"
+                          :val="template.value"
+                          color="pink"
+                        />
+                      </q-item-section>
+                      <q-item-section>
+                        <q-item-label>{{ template.label }}</q-item-label>
+                      </q-item-section>
+                    </q-item>
+
+                    <q-separator />
+                    <q-item-label header>Software development</q-item-label>
+                    <q-item
+                      tag="label"
+                      v-ripple
+                      v-for="template in digital_work_templates"
+                      :key="template.value"
+                    >
+                      <q-item-section avatar>
+                        <q-radio
+                          v-model="selected_template_key"
                           :val="template.value"
                           color="pink"
                         />
@@ -226,9 +264,6 @@
               </q-card-section>
 
               <q-separator />
-              <q-card-actions align="right">
-                <q-btn v-close-popup outline color="pink" label="Okay" />
-              </q-card-actions>
             </q-card>
           </q-dialog>
         </q-card-actions>
@@ -251,8 +286,6 @@ export default defineComponent({
   Components: {},
   data: function () {
     return {
-      convo_template:
-        "The following is a conversation with an AI assistant. The assistant is helpful, creative, clever, and very friendly.\r\n\r\nHuman: Hello, who are you?\r\nAI: I am an AI created by OpenAI. How can I help you today?\r\nHuman: ",
       summarization_template:
         "The following is a conversation with an AI assistant. The assistant is helpful, creative, clever, and very friendly.\r\n\r\nHuman: Hello, who are you?\r\nAI: I am an AI created by OpenAI. How can I help you today?\r\nHuman: Can you summarize this into one sentance for me?\r\n",
       summarization_long_template:
@@ -261,7 +294,19 @@ export default defineComponent({
         "The following is a conversation with an AI assistant. The conversation is about software development.\r\n\r\nHuman: Hello, who are you?\r\nAI: I am an AI created by OpenAI. How can I help you today?\r\nHuman: Can you summarize the following text?\r\n",
       generic_conversation_template:
         "The following is a conversation with an AI assistant. The assistant is helpful, creative, clever, and very friendly.\r\n\r\nHuman: Hello, who are you?\r\nAI: I am an AI created by OpenAI. How can I help you today?\r\nHuman: ",
-      convo_json: { messages: [] },
+      summarization_email:
+        "The following is a conversation with an AI assistant. The assistant is helpful, creative, clever, and very friendly.\r\n\r\nHuman: Hello, who are you?\r\nAI: I am an AI created by OpenAI. How can I help you today?\r\nHuman: Can you summarize this email?\r\n",
+      summarization_bug:
+        "The following is a conversation with an AI assistant. The conversation is about software development.\r\n\r\nHuman: Hello, who are you?\r\nAI: I am an AI created by OpenAI. How can I help you today?\r\nHuman: Can you summarize this bug?\r\n",
+      internet_comment:
+        "The following is a conversation with an AI assistant. The assistant is helpful, creative, clever, and very friendly.\r\n\r\nHuman: Hello, who are you?\r\nAI: I am an AI created by OpenAI. How can I help you today?\r\nHuman: Can you summarize this internet comment?\r\n",
+      email_writing:
+        "The following is a conversation with an AI assistant. The assistant is helpful, creative, clever, and very friendly.\r\n\r\nHuman: Hello, who are you?\r\nAI: I am an AI created by OpenAI. How can I help you today?\r\nHuman: Can you re-write this email more succinctly?\r\n",
+      software_requirements_writing:
+        "The following is a conversation with an AI assistant. The conversation is about software development.\r\n\r\nHuman: Hello, who are you?\r\nAI: I am an AI created by OpenAI. How can I help you today?\r\nHuman: Can you re-write this software requirment more succinctly?\r\n",
+      summarization_ticket:
+        "The following is a conversation with an AI assistant. The conversation is about software development.\r\n\r\nHuman: Hello, who are you?\r\nAI: I am an AI created by OpenAI. How can I help you today?\r\nHuman: Can you summarize what this ticket is asking for?\r\n",
+      convo_json: {},
       user_input: "",
       msg_sequence: 2,
       toggle_spinner: false,
@@ -280,25 +325,86 @@ export default defineComponent({
       ],
       ai_model_engine: "text-davinci-002",
       showTokenWarning: false,
-      templates: [
+      conversation_templates: [
         {
-          label: "Generic conversation (default)",
+          label: "Conversation (default)",
           value: "generic_conversation",
           color: "pink",
+          text: "The following is a conversation with an AI assistant. The assistant is helpful, creative, clever, and very friendly.\r\n\r\nHuman: Hello, who are you?\r\nAI: I am an AI created by OpenAI. How can I help you today?\r\nHuman: ",
+          prefix: "",
         },
         {
-          label: "Summarization - into one sentance",
+          label: "Summarize into one sentance",
           value: "summarization",
           color: "pink",
+          text: "The following is a conversation with an AI assistant. The assistant is helpful, creative, clever, and very friendly.\r\n\r\nHuman: Hello, who are you?\r\nAI: I am an AI created by OpenAI. How can I help you today?\r\nHuman: Can you summarize this into one sentance for me?\r\n",
+          prefix: "Can you summarize this into one sentance for me?\r\n",
         },
-        { label: "Summarization", value: "summarization_long", color: "pink" },
         {
-          label: "Summarization - software development",
-          value: "summarization_dev",
+          label: "Summarization",
+          value: "summarization_long",
           color: "pink",
+          text: "The following is a conversation with an AI assistant. The assistant is helpful, creative, clever, and very friendly.\r\n\r\nHuman: Hello, who are you?\r\nAI: I am an AI created by OpenAI. How can I help you today?\r\nHuman: Can you summarize the following text?\r\n",
+          prefix: "Can you summarize the following text?\r\n",
         },
       ],
-      selected_template: "generic_conversation",
+      internet_task_templates: [
+        {
+          label: "Email summarization",
+          value: "summarization_email",
+          color: "pink",
+          text: "The following is a conversation with an AI assistant. The assistant is helpful, creative, clever, and very friendly.\r\n\r\nHuman: Hello, who are you?\r\nAI: I am an AI created by OpenAI. How can I help you today?\r\nHuman: Can you summarize the following email?\r\n",
+          prefix: "Can you summarize the following email?\r\n",
+        },
+        {
+          label: "Email writing help",
+          value: "email_writing",
+          color: "pink",
+          text: "The following is a conversation with an AI assistant. The assistant is helpful, creative, clever, and very friendly.\r\n\r\nHuman: Hello, who are you?\r\nAI: I am an AI created by OpenAI. How can I help you today?\r\nHuman: Can you re-write the following email body more succinctly?\r\n",
+          prefix:
+            "Can you re-write the following email body more succinctly?\r\n",
+        },
+        {
+          label: "Summarize internet comment",
+          value: "internet_comment",
+          color: "pink",
+          text: "The following is a conversation with an AI assistant. The assistant is helpful, creative, clever, and very friendly.\r\n\r\nHuman: Hello, who are you?\r\nAI: I am an AI created by OpenAI. How can I help you today?\r\nHuman: Can you summarize this internet comment?\r\n",
+          prefix: "Can you summarize this internet comment?\r\n",
+        },
+      ],
+      digital_work_templates: [
+        {
+          label: "Bug summarization",
+          value: "summarization_bug",
+          color: "pink",
+          text: "The following is a conversation with an AI assistant. The conversation is about software development.\r\n\r\nHuman: Hello, who are you?\r\nAI: I am an AI created by OpenAI. How can I help you today?\r\nHuman: Can you summarize this bug?\r\n",
+          prefix: "Can you summarize this bug?\r\n",
+        },
+        {
+          label: "Customer ticket summarization",
+          value: "summarization_ticket",
+          color: "pink",
+          text: "The following is a conversation with an AI assistant. The conversation is about software development.\r\n\r\nHuman: Hello, who are you?\r\nAI: I am an AI created by OpenAI. How can I help you today?\r\nHuman: Can you summarize what this ticket is asking for?\r\n",
+          prefix: "Can you summarize what this ticket is asking for?\r\n",
+        },
+        {
+          label: "Software requirement writing",
+          value: "software_requirement_writing",
+          color: "pink",
+          text: "The following is a conversation with an AI assistant. The conversation is about software development.\r\n\r\nHuman: Hello, who are you?\r\nAI: I am an AI created by OpenAI. How can I help you today?\r\nHuman: Can you re-write the following software requirement more succinctly?\r\n",
+          prefix:
+            "Can you re-write the following software requirement more succinctly?\r\n",
+        },
+      ],
+      selected_template: {
+        label: "Conversation (default)",
+        value: "generic_conversation",
+        color: "pink",
+        text: "The following is a conversation with an AI assistant. The assistant is helpful, creative, clever, and very friendly.\r\n\r\nHuman: Hello, who are you?\r\nAI: I am an AI created by OpenAI. How can I help you today?\r\nHuman: ",
+        prefix: "",
+      },
+      selected_template_key: "generic_conversation",
+      show_prefix: false,
       premium_tf: false,
       error_message: "",
       is_error: false,
@@ -314,7 +420,9 @@ export default defineComponent({
     },
     getTokenCount() {
       var vm = this;
-      return Math.round((vm.convo_template.length + vm.user_input.length) / 4);
+      return Math.round(
+        (vm.selected_template.text.length + vm.user_input.length) / 4
+      );
     },
     getBotAvatarPath() {
       var vm = this;
@@ -361,12 +469,13 @@ export default defineComponent({
   },
   created: function () {
     var vm = this; // vm = view model, the vue instance
+    vm.convo_json = _.cloneDeep(TestJson);
     if (localStorage.user_id) {
       this.user_id = localStorage.user_id;
       this.is_signed_in = true;
       vm.getSettings();
     }
-    vm.loadTemplate("Conversation");
+    // vm.loadTemplate("Conversation");
 
     //const log = document.getElementById('userinput'); this is broke... should be in mounted
 
@@ -397,6 +506,36 @@ export default defineComponent({
   },
   mounted() {},
   watch: {
+    selected_template_key(key) {
+      // set the selected template based on radio selection
+      var vm = this;
+      var template = undefined;
+
+      template = _.find(vm.conversation_templates, function (o) {
+        return o.value === key;
+      });
+      if (template != undefined) {
+        vm.selected_template = template;
+      }
+      template = _.find(vm.internet_task_templates, function (o) {
+        return o.value === key;
+      });
+      if (template != undefined) {
+        vm.selected_template = template;
+      }
+      template = _.find(vm.digital_work_templates, function (o) {
+        return o.value === key;
+      });
+      if (template != undefined) {
+        vm.selected_template = template;
+      }
+
+      if (vm.selected_template.prefix != "") {
+        vm.show_prefix = true;
+      }
+      vm.show_templates = false;
+      vm.convo_json = _.cloneDeep(TestJson);
+    },
     getTokenCount(count) {
       var vm = this;
       if (count > 1024) {
@@ -405,37 +544,36 @@ export default defineComponent({
           "Token limit reached. Refresh the page to start a new conversation.";
       }
     },
-    selected_template(new_template) {
-      var vm = this;
-      vm.loadTemplate(new_template);
-      vm.show_templates = false;
-    },
     name(user_id) {
       console.log("watcher firing");
       localStorage.user_id = user_id;
     },
   },
   methods: {
-    loadTemplate: function (template_name) {
+    loadTemplate: function (template) {
       var vm = this;
+      vm.prompt_type = template.value;
+      vm.selected_template.text = template.text;
+      vm.message_prefix = template.prefix;
+
       if (template_name === "generic_conversation") {
         vm.prompt_type = "generic_conversation";
-        vm.convo_template = vm.generic_conversation_template;
+        vm.selected_template.text = vm.generic_conversation_template;
       } else if (template_name === "summarization") {
         vm.prompt_type = "summarization";
-        vm.convo_template = vm.summarization_template;
+        vm.selected_template.text = vm.summarization_template;
         vm.message_prefix =
           "Can you summarize this into one sentance for me?\r\n";
       } else if (template_name === "summarization_long") {
         vm.prompt_type = "summarization";
-        vm.convo_template = vm.summarization_long_template;
+        vm.selected_template.text = vm.summarization_long_template;
         vm.message_prefix = "Can you summarize the following text?\r\n";
       } else if (template_name === "summarization_dev") {
         vm.prompt_type = "summarization";
-        vm.convo_template = vm.summarization_dev_template;
+        vm.selected_template.text = vm.summarization_dev_template;
         vm.message_prefix = "Can you summarize the following text?\r\n";
       }
-      vm.convo_json = TestJson;
+      //vm.convo_json = TestJson;
     },
     add_quotes_for_summarization: function (userinput) {
       if (_.startsWith(userinput, '"') && _.endsWith(userinput, '"')) {
@@ -452,20 +590,23 @@ export default defineComponent({
     },
     send_message: function () {
       var vm = this;
-      if (vm.prompt_type == "summarization") {
+      if (vm.show_prefix) {
         // task specific molding of input
         vm.user_input = vm.add_quotes_for_summarization(vm.user_input); // quotes for passage to summarize bc LLM magicks?
+        vm.message_prefix = vm.selected_template.prefix;
+        vm.show_prefix = false;
       }
       var human_message = {
         messageId: uuidv4(), // make this guid
         sender: "Human",
         message_text: vm.message_prefix + vm.user_input, // prepend the task instruction.... 'Can you summarize this?' etc
       };
+      vm.message_prefix = "";
       human_message.messageId = human_message.messageId + 1;
       vm.convo_json.messages.push(human_message);
       vm.toggle_spinner = true;
-      vm.convo_template =
-        String(vm.convo_template) + String(vm.user_input) + "\r\nAI:";
+      vm.selected_template.text =
+        String(vm.selected_template.text) + String(vm.user_input) + "\r\nAI:";
       vm.user_input = "";
       const api_headers = {
         "Content-Type": "application/json",
@@ -478,7 +619,7 @@ export default defineComponent({
           `${process.env.API}/completions`,
           {
             engine: vm.ai_model_engine,
-            prompt: vm.convo_template,
+            prompt: vm.selected_template.text,
             max_tokens: 150,
             temperature: 0.9,
             top_p: 1,
@@ -505,15 +646,15 @@ export default defineComponent({
           };
           vm.toggle_spinner = false;
           vm.convo_json.messages.push(ai_message);
-          vm.convo_template =
-            String(vm.convo_template) +
+          vm.selected_template.text =
+            String(vm.selected_template.text) +
             String(ai_message.message_text) +
             "\r\n" +
             "Human: ";
           console.log(":::Messages Obj:::");
           console.log(vm.convo_json);
           console.log(":::Messages str:::");
-          console.log(vm.convo_template);
+          console.log(vm.selected_template.text);
         })
         .catch(function (error) {
           console.log(error);
