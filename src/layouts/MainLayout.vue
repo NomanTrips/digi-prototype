@@ -9,6 +9,15 @@
         </q-toolbar-title>
         <div>
           <q-btn
+            flat
+            round
+            color="white"
+            icon="help"
+            to="/about"
+            :size="screenSize > 600 ? 'sm' : 'xs'"
+            class="q-mx-xs"
+          />
+          <q-btn
             v-show="is_signed_in === false"
             icon="login"
             aria-label="login"
@@ -508,12 +517,12 @@ export default defineComponent({
         vm.signup_hint = "Sign up to pick an AI skin!";
         setTimeout(() => {
           vm.prompt_timer();
-        }, 10000);
+        }, 30000);
       } else if (!vm.premium_tf) {
         vm.signup_hint = "Go Premium to talk to a smarter AI!";
         setTimeout(() => {
           vm.prompt_timer();
-        }, 10000);
+        }, 30000);
       }
     }
   },
