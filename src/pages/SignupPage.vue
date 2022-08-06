@@ -107,7 +107,17 @@
               type="email"
               label="Email*"
               label-color="pink"
-            />
+              @blur="emailUniquenessCheck"
+              :error="is_validation_error"
+              clearable
+              @clear="is_validation_error = false"
+              :disable="is_validating"
+              :loading="is_validating"
+            >
+              <template v-slot:error>
+                There's already a user account associated to that email address
+              </template>
+            </q-input>
 
             <q-input
               filled
@@ -151,7 +161,22 @@
             -->
 
             <div>
-              <q-btn outline label="Create" type="submit" color="pink" />
+              <q-btn
+                outline
+                label="Create"
+                type="submit"
+                color="pink"
+                :disable="
+                  is_validating ||
+                  is_validation_error ||
+                  username === '' ||
+                  password === '' ||
+                  retyped_password === '' ||
+                  email === '' ||
+                  firstname === '' ||
+                  lastname === ''
+                "
+              />
             </div>
           </q-form>
         </q-card-section>
@@ -182,12 +207,39 @@ export default defineComponent({
       accept: true,
       is_failure: false,
       isPwd: true,
+      is_validation_error: false,
+      is_validating: false,
     };
   },
   created: function () {
     var vm = this; // vm = view model, the vue instance
   },
   methods: {
+    emailUniquenessCheck: function () {
+      var vm = this;
+      if (vm.email === null || vm.email.length === 0) {
+        return;
+      }
+      vm.is_validating = true;
+      vm.is_validation_error = false;
+      axios
+        .post(`${process.env.API}/users/email-uniqueness-check`, {
+          email: vm.email,
+        })
+        .then(function (response) {
+          console.log(response);
+          if (!response.data.is_unique) {
+            vm.is_validation_error = true;
+          }
+        })
+        .catch(function (error) {
+          console.log(error);
+        })
+        .then(function () {
+          // always executed
+          vm.is_validating = false;
+        });
+    },
     onSubmit: function () {
       var vm = this;
       vm.is_failure = false;
