@@ -43,7 +43,7 @@
         </q-card-section>
         <q-separator />
         <q-card-section style="padding: 8px">
-          <div style="max-width: 500px">
+          <div style="max-width: 500px" id="inputbox">
             <q-chat-message
               style="font-style: italic"
               size="10"
@@ -67,11 +67,12 @@
               outlined
               color="pink"
               autogrow
-              :disable="toggle_spinner || is_error"
+              :disable="toggle_spinner"
               :placeholder="show_prefix ? '[Insert Text Here]' : ''"
               ref="userinput"
               :error="is_error"
               hide-bottom-space
+              @clear="is_error = false"
             >
               <template v-slot:append>
                 <q-btn
@@ -81,6 +82,7 @@
                   flat
                   icon="send"
                   @click="send_message"
+                  :disable="is_error"
                 />
               </template>
               <template v-slot:error>
@@ -95,19 +97,19 @@
               :size="screenSize > 600 ? 'md' : 'sm'"
               outline
               color="pink"
-              icon="edit_note"
-              @click="card = true"
+              icon="psychology"
+              @click="show_templates = true"
               class="q-mx-xs q-mb-md"
-              >Edit prompt</q-btn
+              >Tasks</q-btn
             >
             <q-btn
               :size="screenSize > 600 ? 'md' : 'sm'"
               outline
               color="pink"
-              icon="psychology"
-              @click="show_templates = true"
+              icon="text_snippet"
+              @click="card = true"
               class="q-mx-xs q-mb-md"
-              >Tasks</q-btn
+              >View prompt</q-btn
             >
             <q-btn
               :size="screenSize > 600 ? 'md' : 'sm'"
@@ -128,11 +130,17 @@
               <q-tooltip>Token limit</q-tooltip>
             </q-chip>
           </div>
-
+          <div
+            class="row justify-center text-caption"
+            v-show="selected_template_key != 'generic_conversation'"
+            style="color: goldenrod"
+          >
+            Interacting with an AI system: approach the output carefully.
+          </div>
           <q-dialog v-model="card">
             <q-card class="my-card" style="width: 400px">
               <q-card-section>
-                <div class="text-h6">Edit prompt text:</div>
+                <div class="text-h6">Prompt text:</div>
               </q-card-section>
               <q-card-section>
                 <div>
@@ -143,6 +151,7 @@
                     type="textarea"
                     autogrow
                     @focus="user_input = ''"
+                    :disable="user_id != 17"
                   />
                 </div>
               </q-card-section>
@@ -536,6 +545,18 @@ export default defineComponent({
       vm.show_templates = false;
       vm.convo_json = _.cloneDeep(TestJson);
     },
+    user_input(input) {
+      var vm = this;
+      if (input != null) {
+        if (input.length > 1000) {
+          vm.is_error = true;
+          vm.error_message = "Input is too big. Try something smaller";
+        } else {
+          vm.is_error = false;
+          vm.error_message = "";
+        }
+      }
+    },
     getTokenCount(count) {
       var vm = this;
       if (count > 1024) {
@@ -655,6 +676,8 @@ export default defineComponent({
           console.log(vm.convo_json);
           console.log(":::Messages str:::");
           console.log(vm.selected_template.text);
+          const element = document.getElementById("inputbox");
+          element.scrollIntoView();
         })
         .catch(function (error) {
           console.log(error);

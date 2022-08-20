@@ -19,6 +19,14 @@
           <div class="row">
             <a>admin@digissist.io</a>
           </div>
+          <div class="row q-my-md">
+            <q-btn
+              outline
+              label="Submit feedback"
+              color="pink"
+              to="/feedback"
+            />
+          </div>
           <h6 class="text-pink q-my-md">Usage policy</h6>
           <div class="row">
             <b>Interact with the AI responsibly:</b>

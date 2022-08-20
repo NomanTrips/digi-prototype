@@ -21,7 +21,7 @@
           </h6>
           <div class="text-body2 text-center">
             Premium users can talk to Davinci: the smartest AI of the GPT-3
-            family. They also get premium AI skins and user avatars.
+            family. They also get access to premium AI skins.
           </div>
 
           <div class="q-pa-md">
@@ -86,10 +86,10 @@ const columns = [
     field: "ai_skins",
   },
   {
-    name: "user_avatars",
-    label: "Premium user avatars",
+    name: "price",
+    label: "Price",
     align: "left",
-    field: "user_avatars",
+    field: "price",
   },
 ];
 
@@ -99,14 +99,14 @@ const rows = [
     ai_models: "GPT-3 Davinci",
     token_limit: "Unlimited",
     ai_skins: "Yes",
-    user_avatars: "Yes",
+    price: "5$/month",
   },
   {
     name: "Free",
     ai_models: "GPT-3 Curie",
     token_limit: "5000 per month",
     ai_skins: "No",
-    user_avatars: "No",
+    price: "Free",
   },
 ];
 
