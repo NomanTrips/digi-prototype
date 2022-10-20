@@ -130,12 +130,8 @@
               <q-tooltip>Token limit</q-tooltip>
             </q-chip>
           </div>
-          <div
-            class="row justify-center text-caption"
-            v-show="selected_template_key != 'generic_conversation'"
-            style="color: goldenrod"
-          >
-            Interacting with an AI system: approach the output carefully.
+          <div class="row justify-center text-caption" style="color: goldenrod">
+            Interacting with an AI system: verify the output carefully.
           </div>
           <q-dialog v-model="card">
             <q-card class="my-card" style="width: 400px">
@@ -688,7 +684,7 @@ export default defineComponent({
           } else if (error.response.status === 500) {
             if (error.response.data === "Unsafe content") {
               vm.error_message =
-                "Unsafe content was detected by the content filter. This could include profanity or hateful language. Please refresh the page to try again.";
+                "We detected inappropriate content in the output. Please refresh the page and try a new conversation.";
               vm.is_error = true;
             }
           }
