@@ -17,7 +17,6 @@
                 :size="screenSize > 600 ? '58px' : '48px'"
                 :props="props"
                 class="q-mx-xs"
-                v-show="!is_loading"
               >
                 <img v-show="message.sender == 'AI'" :src="getBotAvatarPath" />
                 <img
@@ -25,9 +24,6 @@
                   :src="getHumanAvatarPath"
                 />
               </q-avatar>
-              <div v-show="is_loading" class="q-pa-xs">
-                <q-spinner color="pink" size="2em" />
-              </div>
             </template>
           </q-chat-message>
 
@@ -317,8 +313,8 @@ export default defineComponent({
       toggle_spinner: false,
       user_id: 24, // free account user id
       is_signed_in: true,
-      avatar: "human_1",
-      bot_avatar: "owley",
+      avatar: null,
+      bot_avatar: null,
       is_loading: false,
       message_prefix: "",
       prompt_type: "generic_conversation",
@@ -431,54 +427,60 @@ export default defineComponent({
     },
     getBotAvatarPath() {
       var vm = this;
-      if (vm.is_loading) {
+      if (vm.bot_avatar === null) {
         return `${process.env.ICON_PATH}/white_square.png`;
+      } else if (vm.bot_avatar === "green_spark") {
+        return `${process.env.ICON_PATH}/green_spark.png`;
+      } else if (vm.bot_avatar === "penguin") {
+        return `${process.env.ICON_PATH}/penguin.png`;
+      } else if (vm.bot_avatar === "default") {
+        return `${process.env.ICON_PATH}/default.png`;
+      } else if (vm.bot_avatar === "diaspora") {
+        return `${process.env.ICON_PATH}/diaspora.png`;
+      } else if (vm.bot_avatar === "big_un") {
+        return `${process.env.ICON_PATH}/big_un.png`;
+      } else if (vm.bot_avatar === "mantis") {
+        return `${process.env.ICON_PATH}/mantis.png`;
+      } else if (vm.bot_avatar === "orphan") {
+        return `${process.env.ICON_PATH}/orphan.png`;
       } else {
-        if (vm.bot_avatar === "green_spark") {
-          return `${process.env.ICON_PATH}/green_spark.png`;
-        } else if (vm.bot_avatar === "penguin") {
-          return `${process.env.ICON_PATH}/penguin.png`;
-        } else if (vm.bot_avatar === "default") {
-          return `${process.env.ICON_PATH}/default.png`;
-        } else if (vm.bot_avatar === "diaspora") {
-          return `${process.env.ICON_PATH}/diaspora.png`;
-        } else if (vm.bot_avatar === "big_un") {
-          return `${process.env.ICON_PATH}/big_un.png`;
-        } else if (vm.bot_avatar === "mantis") {
-          return `${process.env.ICON_PATH}/mantis.png`;
-        } else if (vm.bot_avatar === "orphan") {
-          return `${process.env.ICON_PATH}/orphan.png`;
-        } else {
-          return `${process.env.ICON_PATH}/owley.png`;
-        }
+        return `${process.env.ICON_PATH}/owley.png`;
       }
     },
     getHumanAvatarPath() {
       var vm = this;
-      if (vm.is_loading) {
+      if (vm.avatar === null) {
         return `${process.env.ICON_PATH}/white_square.png`;
+      } else if (vm.avatar === "human_2") {
+        return `${process.env.ICON_PATH}/human_2.png`;
+      } else if (vm.avatar === "human_3") {
+        return `${process.env.ICON_PATH}/human_3.png`;
+      } else if (vm.avatar === "human_4") {
+        return `${process.env.ICON_PATH}/human_4.png`;
+      } else if (vm.avatar === "human_5") {
+        return `${process.env.ICON_PATH}/human_5.png`;
       } else {
-        if (vm.avatar === "human_2") {
-          return `${process.env.ICON_PATH}/human_2.png`;
-        } else if (vm.avatar === "human_3") {
-          return `${process.env.ICON_PATH}/human_3.png`;
-        } else if (vm.avatar === "human_4") {
-          return `${process.env.ICON_PATH}/human_4.png`;
-        } else if (vm.avatar === "human_5") {
-          return `${process.env.ICON_PATH}/human_5.png`;
-        } else {
-          return `${process.env.ICON_PATH}/human_1.png`;
-        }
+        return `${process.env.ICON_PATH}/human_1.png`;
       }
     },
   },
   created: function () {
     var vm = this; // vm = view model, the vue instance
     vm.convo_json = _.cloneDeep(TestJson);
+    if (localStorage.getItem("bot_avatar") != null) {
+      vm.bot_avatar = localStorage.bot_avatar;
+    }
+    if (localStorage.getItem("avatar") != null) {
+      vm.avatar = localStorage.avatar;
+    }
     if (localStorage.user_id) {
       this.user_id = localStorage.user_id;
       this.is_signed_in = true;
       vm.getSettings();
+    } else {
+      // set some default skins
+      vm.bot_avatar = "owley";
+      vm.avatar = "human_1";
     }
     // vm.loadTemplate("Conversation");
 
@@ -709,6 +711,9 @@ export default defineComponent({
             // handle success
             vm.bot_avatar = response.data.bot_avatar;
             vm.avatar = response.data.avatar;
+            // save avatars to local storage for quick access later
+            localStorage.bot_avatar = response.data.bot_avatar;
+            localStorage.avatar = response.data.avatar;
           })
           .catch(function (error) {
             // handle error

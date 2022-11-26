@@ -607,6 +607,8 @@ export default defineComponent({
       localStorage.removeItem("token");
       localStorage.removeItem("username");
       localStorage.removeItem("premium_tf");
+      localStorage.removeItem("bot_avatar");
+      localStorage.removeItem("avatar");
       vm.is_signed_in = false;
       window.location.reload();
     },
@@ -666,10 +668,11 @@ export default defineComponent({
           })
           .then(function (response) {
             // handle success
-            //console.log(response);
-
             vm.bot_avatar = response.data.bot_avatar;
             vm.avatar = response.data.avatar;
+            // save avatars to local storage for quick access later
+            localStorage.bot_avatar = response.data.bot_avatar;
+            localStorage.avatar = response.data.avatar;
           })
           .catch(function (error) {
             // handle error

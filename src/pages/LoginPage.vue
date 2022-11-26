@@ -52,10 +52,23 @@
 
             <div class="row">
               <div class="q-pl-xs">
-                <q-btn outline label="Login" type="submit" color="pink" />
+                <q-btn
+                  outline
+                  label="Login"
+                  type="submit"
+                  color="pink"
+                  :disable="is_loading"
+                  :loading="is_loading"
+                />
               </div>
               <div class="q-pl-xs">
-                <q-btn outline label="Signup" color="pink" to="/signup" />
+                <q-btn
+                  outline
+                  label="Signup"
+                  color="pink"
+                  to="/signup"
+                  :disable="is_loading"
+                />
               </div>
             </div>
           </q-form>
@@ -86,6 +99,7 @@ export default defineComponent({
       stripe_customer_id: null,
       subscription_status: null,
       is_signed_in: false,
+      is_loading: false,
     };
   },
   created: function () {
@@ -130,6 +144,7 @@ export default defineComponent({
     onSubmit: function () {
       var vm = this;
       vm.is_failure = false;
+      vm.is_loading = true;
       const api_headers = {
         "Content-Type": "application/json",
       };
@@ -167,6 +182,10 @@ export default defineComponent({
           console.log(error);
           vm.is_failure = true;
           vm.err_msg = "error";
+        })
+        .then(function () {
+          // always executed
+          vm.is_loading = false;
         });
     },
   },
