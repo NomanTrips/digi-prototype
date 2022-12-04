@@ -319,12 +319,13 @@ export default defineComponent({
       message_prefix: "",
       prompt_type: "generic_conversation",
       ai_model_engines: [
+        "text-davinci-003",
         "text-davinci-002",
         "text-curie-001",
         "text-babbage-001",
         "text-ada-001",
       ],
-      ai_model_engine: "text-davinci-002",
+      ai_model_engine: "text-davinci-003",
       showTokenWarning: false,
       conversation_templates: [
         {
