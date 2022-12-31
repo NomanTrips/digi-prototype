@@ -12,6 +12,7 @@
 const { configure } = require('quasar/wrappers');
 
 
+
 module.exports = configure(function (ctx) {
   return {
     eslint: {
@@ -30,7 +31,7 @@ module.exports = configure(function (ctx) {
     // --> boot files are part of "main.js"
     // https://v2.quasar.dev/quasar-cli/boot-files
     boot: [
-      
+      //'highlightjs',
       
     ],
 
@@ -90,6 +91,11 @@ module.exports = configure(function (ctx) {
       // vitePlugins: [
       //   [ 'package-name', { ..options.. } ]
       // ]
+      extendViteConf (viteConf, { isServer, isClient }) {
+        // do something with viteConf... change it in-place
+        
+    
+      },
     },
 
     // Full list of options: https://v2.quasar.dev/quasar-cli-vite/quasar-config-js#devServer

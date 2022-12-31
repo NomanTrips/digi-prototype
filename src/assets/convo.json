@@ -3,13 +3,16 @@
       {
 		 "messageId": 1,
 	     "sender":"Human",
-         "message_text":"Hello, who are you?"
+         "message_text":"Hello, who are you?",
+         "is_code": false
 
       },
       {
 	     "messageId": 2,
 	     "sender":"AI",
-         "message_text":"I am an AI created by OpenAI. How can I help you today?"
+         "message_text":"I am an AI created by OpenAI. How can I help you today?",
+         "is_code": false
+
 
       }
    ]

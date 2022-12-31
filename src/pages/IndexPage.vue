@@ -11,6 +11,7 @@
             :sent="message.sender != 'AI'"
             :bg-color="message.sender == 'AI' ? 'pink' : 'light-grey'"
             :text-color="message.sender == 'AI' ? 'white' : 'black'"
+            :text-html="message.is_code"
           >
             <template v-slot:avatar="props">
               <q-avatar
@@ -570,6 +571,16 @@ export default defineComponent({
     },
   },
   methods: {
+    doesStrContainProgrammingChars(str) {
+      let regex = /([\#\{\(\[\;])\w+/g;
+      let matches = str.match(regex);
+      //console.log(matches);
+      if (matches != null) {
+        return true;
+      } else {
+        return false;
+      }
+    },
     loadTemplate: function (template) {
       var vm = this;
       vm.prompt_type = template.value;
@@ -663,14 +674,20 @@ export default defineComponent({
             messageId: uuidv4(),
             sender: "AI",
             message_text: String(response.data.choices[0].text),
+            is_code: false,
           };
           vm.toggle_spinner = false;
-          vm.convo_json.messages.push(ai_message);
           vm.selected_template.text =
             String(vm.selected_template.text) +
             String(ai_message.message_text) +
             "\r\n" +
             "Human: ";
+          if (vm.doesStrContainProgrammingChars(ai_message.message_text)) {
+            // add code and pre tags to render the code better on the screen
+            ai_message.is_code = true;
+            ai_message.message_text = `<pre style="white-space:pre-wrap;"><code>${ai_message.message_text}</code></pre>`;
+          }
+          vm.convo_json.messages.push(ai_message);
           console.log(":::Messages Obj:::");
           console.log(vm.convo_json);
           console.log(":::Messages str:::");
@@ -743,6 +760,20 @@ export default defineComponent({
 });
 </script>
 <style scoped>
+body {
+  font-size: 1rem;
+  line-height: 1.5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  min-height: 100vh;
+  background-color: #dadada;
+}
+pre {
+  background: #eee;
+  padding-bottom: 2em;
+}
 img q-message-avatar {
   border-radius: 50%;
   width: 64px;
