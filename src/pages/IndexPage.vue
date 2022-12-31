@@ -3,30 +3,50 @@
     <div style="width: 100%; max-width: 500px">
       <q-card class="my-card" style="margin-bottom: 15px">
         <q-card-section style="padding: 10px">
-          <q-chat-message
+          <div
             v-for="message in convo_json.messages"
             :key="message.messageId"
-            :name="message.sender"
-            :text="[message.message_text]"
-            :sent="message.sender != 'AI'"
-            :bg-color="message.sender == 'AI' ? 'pink' : 'light-grey'"
-            :text-color="message.sender == 'AI' ? 'white' : 'black'"
-            :text-html="message.is_code"
+            :class="
+              message.sender == 'AI' ? 'row justify-start' : 'row justify-end'
+            "
           >
-            <template v-slot:avatar="props">
-              <q-avatar
-                :size="screenSize > 600 ? '58px' : '48px'"
-                :props="props"
-                class="q-mx-xs"
-              >
-                <img v-show="message.sender == 'AI'" :src="getBotAvatarPath" />
-                <img
-                  v-show="message.sender != 'AI'"
-                  :src="getHumanAvatarPath"
-                />
-              </q-avatar>
-            </template>
-          </q-chat-message>
+            <q-chat-message
+              :name="message.sender"
+              :text="[message.message_text]"
+              :sent="message.sender != 'AI'"
+              :bg-color="message.sender == 'AI' ? 'pink' : 'light-grey'"
+              :text-color="message.sender == 'AI' ? 'white' : 'black'"
+              :text-html="message.is_code"
+              style="max-width: 450px"
+            >
+              <template v-slot:avatar="props">
+                <q-avatar
+                  :size="screenSize > 600 ? '58px' : '48px'"
+                  :props="props"
+                  class="q-mx-xs"
+                >
+                  <img
+                    v-show="message.sender == 'AI'"
+                    :src="getBotAvatarPath"
+                  />
+                  <img
+                    :v-show="message.sender != 'AI'"
+                    :src="getHumanAvatarPath"
+                  />
+                </q-avatar>
+              </template>
+            </q-chat-message>
+            <q-btn
+              flat
+              round
+              size="xs"
+              icon="content_copy"
+              align="center"
+              v-show="message.sender == 'AI'"
+              style="width: 16px; height: 16px; margin-top: 20px"
+              @click="updateClipboard(message.message_text)"
+            ></q-btn>
+          </div>
 
           <q-chat-message
             v-show="toggle_spinner"
@@ -571,6 +591,21 @@ export default defineComponent({
     },
   },
   methods: {
+    removeTags(str) {
+      return str.replace(/<\/?pre[^>]*>|<\/?code>/gi, "");
+    },
+    updateClipboard(newClip) {
+      var vm = this;
+      newClip = vm.removeTags(newClip);
+      navigator.clipboard.writeText(newClip).then(
+        () => {
+          /* clipboard successfully set */
+        },
+        () => {
+          /* clipboard write failed */
+        }
+      );
+    },
     doesStrContainProgrammingChars(str) {
       let regex = /([\#\{\(\[\;])\w+/g;
       let matches = str.match(regex);
