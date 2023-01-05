@@ -10,42 +10,47 @@
               message.sender == 'AI' ? 'row justify-start' : 'row justify-end'
             "
           >
-            <q-chat-message
-              :name="message.sender"
-              :text="[message.message_text]"
-              :sent="message.sender != 'AI'"
-              :bg-color="message.sender == 'AI' ? 'pink' : 'light-grey'"
-              :text-color="message.sender == 'AI' ? 'white' : 'black'"
-              :text-html="message.is_code"
-              style="max-width: 450px"
+            <div class="col-11">
+              <q-chat-message
+                :name="message.sender"
+                :text="[message.message_text]"
+                :sent="message.sender != 'AI'"
+                :bg-color="message.sender == 'AI' ? 'pink' : 'light-grey'"
+                :text-color="message.sender == 'AI' ? 'white' : 'black'"
+                :text-html="message.is_code"
+              >
+                <template v-slot:avatar="props">
+                  <q-avatar
+                    :size="screenSize > 600 ? '58px' : '48px'"
+                    :props="props"
+                    class="q-mx-xs"
+                  >
+                    <img
+                      v-show="message.sender == 'AI'"
+                      :src="getBotAvatarPath"
+                    />
+                    <img
+                      :v-show="message.sender != 'AI'"
+                      :src="getHumanAvatarPath"
+                    />
+                  </q-avatar>
+                </template>
+              </q-chat-message>
+            </div>
+            <div
+              class="col-1"
+              v-show="message.sender == 'AI' && screenSize > 600"
             >
-              <template v-slot:avatar="props">
-                <q-avatar
-                  :size="screenSize > 600 ? '58px' : '48px'"
-                  :props="props"
-                  class="q-mx-xs"
-                >
-                  <img
-                    v-show="message.sender == 'AI'"
-                    :src="getBotAvatarPath"
-                  />
-                  <img
-                    :v-show="message.sender != 'AI'"
-                    :src="getHumanAvatarPath"
-                  />
-                </q-avatar>
-              </template>
-            </q-chat-message>
-            <q-btn
-              flat
-              round
-              size="xs"
-              icon="content_copy"
-              align="center"
-              v-show="message.sender == 'AI'"
-              style="width: 16px; height: 16px; margin-top: 20px"
-              @click="updateClipboard(message.message_text)"
-            ></q-btn>
+              <q-btn
+                flat
+                round
+                size="xs"
+                icon="content_copy"
+                align="center"
+                style="width: 16px; height: 16px; margin-top: 20px"
+                @click="updateClipboard(message.message_text)"
+              ></q-btn>
+            </div>
           </div>
 
           <q-chat-message
@@ -607,10 +612,12 @@ export default defineComponent({
       );
     },
     doesStrContainProgrammingChars(str) {
-      let regex = /([\#\{\(\[\;])\w+/g;
+      //let regex = /([\#\{\(\[\;])\w+/g;
+      //let regex = /([\#\{\(['"\;])\w+/g;
+      let regex = /([\#\{\(['"\;])\S+/g;
       let matches = str.match(regex);
-      //console.log(matches);
-      if (matches != null) {
+      console.log(matches);
+      if (matches != null && matches.length > 1) {
         return true;
       } else {
         return false;
@@ -718,9 +725,25 @@ export default defineComponent({
             "\r\n" +
             "Human: ";
           if (vm.doesStrContainProgrammingChars(ai_message.message_text)) {
+            console.log("matches");
             // add code and pre tags to render the code better on the screen
             ai_message.is_code = true;
             ai_message.message_text = `<pre style="white-space:pre-wrap;"><code>${ai_message.message_text}</code></pre>`;
+            /*
+            var pattern = /\b(def|function|public|var)\b/; // common coding keywords
+            var match = ai_message.message_text.match(pattern);
+            if (match) {
+              // wrap code in tags
+              ai_message.message_text =
+                ai_message.message_text.slice(0, match.index) +
+                '<pre style="white-space:pre-wrap;"><code>' +
+                ai_message.message_text.slice(match.index);
+              ai_message.message_text += "</code></pre>";
+            } else {
+              // failed to find keywords, just wrap the whole thing
+              ai_message.message_text = `<pre style="white-space:pre-wrap;"><code>${ai_message.message_text}</code></pre>`;
+            }
+            */
           }
           vm.convo_json.messages.push(ai_message);
           console.log(":::Messages Obj:::");
