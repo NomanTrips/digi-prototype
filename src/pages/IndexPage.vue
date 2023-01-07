@@ -7,7 +7,9 @@
             v-for="message in convo_json.messages"
             :key="message.messageId"
             :class="
-              message.sender == 'AI' ? 'row justify-start' : 'row justify-end'
+              message.sender == 'AI'
+                ? 'row justify-start no-wrap'
+                : 'row justify-end no-wrap'
             "
           >
             <div class="col-11">
@@ -614,7 +616,7 @@ export default defineComponent({
     doesStrContainProgrammingChars(str) {
       //let regex = /([\#\{\(\[\;])\w+/g;
       //let regex = /([\#\{\(['"\;])\w+/g;
-      let regex = /([\#\{\(['"\;])\S+/g;
+      let regex = /([\#\{\(['"\;])\S*/g;
       let matches = str.match(regex);
       console.log(matches);
       if (matches != null && matches.length > 1) {
@@ -725,12 +727,10 @@ export default defineComponent({
             "\r\n" +
             "Human: ";
           if (vm.doesStrContainProgrammingChars(ai_message.message_text)) {
-            console.log("matches");
+            //console.log("matches");
             // add code and pre tags to render the code better on the screen
             ai_message.is_code = true;
-            ai_message.message_text = `<pre style="white-space:pre-wrap;"><code>${ai_message.message_text}</code></pre>`;
-            /*
-            var pattern = /\b(def|function|public|var)\b/; // common coding keywords
+            var pattern = /\b(def|function|public|var|import|let)\b/; // common coding keywords
             var match = ai_message.message_text.match(pattern);
             if (match) {
               // wrap code in tags
@@ -743,7 +743,6 @@ export default defineComponent({
               // failed to find keywords, just wrap the whole thing
               ai_message.message_text = `<pre style="white-space:pre-wrap;"><code>${ai_message.message_text}</code></pre>`;
             }
-            */
           }
           vm.convo_json.messages.push(ai_message);
           console.log(":::Messages Obj:::");
