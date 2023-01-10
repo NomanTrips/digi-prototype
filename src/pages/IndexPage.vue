@@ -1,6 +1,6 @@
 <template>
   <div class="q-pa-xs row justify-center">
-    <div style="width: 100%; max-width: 500px">
+    <div style="width: 100%; max-width: 600px">
       <q-card class="my-card" style="margin-bottom: 15px">
         <q-card-section style="padding: 10px">
           <div
@@ -12,7 +12,7 @@
                 : 'row justify-end no-wrap'
             "
           >
-            <div class="col-11">
+            <div class="col-shrink">
               <q-chat-message
                 :name="message.sender"
                 :text="[message.message_text]"
@@ -40,7 +40,7 @@
               </q-chat-message>
             </div>
             <div
-              class="col-1"
+              class="col-auto"
               v-show="message.sender == 'AI' && screenSize > 600"
             >
               <q-btn
@@ -67,7 +67,7 @@
         </q-card-section>
         <q-separator />
         <q-card-section style="padding: 8px">
-          <div style="max-width: 500px" id="inputbox">
+          <div style="max-width: 600px" id="inputbox">
             <q-chat-message
               style="font-style: italic"
               size="10"
