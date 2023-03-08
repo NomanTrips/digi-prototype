@@ -614,9 +614,7 @@ export default defineComponent({
       );
     },
     doesStrContainProgrammingChars(str) {
-      //let regex = /([\#\{\(\[\;])\w+/g;
-      //let regex = /([\#\{\(['"\;])\w+/g;
-      let regex = /([\#\{\(['"\;])\S*/g;
+      let regex = /([\#\{\(;])\S*/g;
       let matches = str.match(regex);
       console.log(matches);
       if (matches != null && matches.length > 1) {
