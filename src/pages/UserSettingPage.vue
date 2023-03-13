@@ -56,10 +56,58 @@
             </q-btn>
           </div>
 
+          <div class="row justify-center text-subtitle1 q-mt-md q-mb-xs">
+            <b>Color scheme:</b>
+          </div>
+          <div class="row justify-center q-ma-md">
+            <q-radio
+              v-model="primary_color"
+              val="pink"
+              label="Pink"
+              color="pink"
+              @click="set_color()"
+            />
+            <q-radio
+              v-model="primary_color"
+              val="grey-10"
+              label="Grey"
+              color="grey-10"
+              @click="set_color()"
+            />
+            <q-radio
+              v-model="primary_color"
+              val="green-13"
+              label="Green"
+              color="green-13"
+              @click="set_color()"
+            />
+            <q-radio
+              v-model="primary_color"
+              val="cyan"
+              label="Cyan"
+              color="cyan"
+              @click="set_color()"
+            />
+            <q-radio
+              v-model="primary_color"
+              val="blue-10"
+              label="Blue"
+              color="blue-10"
+              @click="set_color()"
+            />
+            <q-radio
+              v-model="primary_color"
+              val="purple-6"
+              label="Purple"
+              color="purple-6"
+              @click="set_color()"
+            />
+          </div>
+
           <div class="row justify-center q-ma-md">
             <q-btn
               v-show="is_stripe_customer"
-              color="pink"
+              :color="primary_color"
               outline
               v-close-popup
               label="Manage Billing"
@@ -125,7 +173,7 @@
 
       <q-separator />
       <q-card-actions align="right">
-        <q-btn v-close-popup outline color="pink" label="Okay" />
+        <q-btn v-close-popup outline :color="primary_color" label="Okay" />
       </q-card-actions>
     </q-card>
   </q-dialog>
@@ -139,13 +187,17 @@
         <div>
           <div v-show="is_updating">
             Saving...
-            <q-spinner color="pink" size="2em" />
+            <q-spinner :color="primary_color" size="2em" />
           </div>
 
           <q-list>
             <q-item :disable="is_updating" tag="label" v-ripple>
               <q-item-section avatar>
-                <q-radio v-model="bot_avatar" val="default" color="pink" />
+                <q-radio
+                  v-model="bot_avatar"
+                  val="default"
+                  :color="primary_color"
+                />
               </q-item-section>
               <q-item-section>
                 <q-item-label>default</q-item-label>
@@ -159,7 +211,11 @@
 
             <q-item :disable="is_updating" tag="label" v-ripple>
               <q-item-section avatar>
-                <q-radio v-model="bot_avatar" val="green_spark" color="pink" />
+                <q-radio
+                  v-model="bot_avatar"
+                  val="green_spark"
+                  :color="primary_color"
+                />
               </q-item-section>
               <q-item-section>
                 <q-item-label>green spark</q-item-label>
@@ -173,7 +229,11 @@
 
             <q-item :disable="is_updating" tag="label" v-ripple>
               <q-item-section avatar>
-                <q-radio v-model="bot_avatar" val="penguin" color="pink" />
+                <q-radio
+                  v-model="bot_avatar"
+                  val="penguin"
+                  :color="primary_color"
+                />
               </q-item-section>
               <q-item-section>
                 <q-item-label>penguin</q-item-label>
@@ -187,7 +247,11 @@
 
             <q-item :disable="is_updating" tag="label" v-ripple>
               <q-item-section avatar>
-                <q-radio v-model="bot_avatar" val="owley" color="pink" />
+                <q-radio
+                  v-model="bot_avatar"
+                  val="owley"
+                  :color="primary_color"
+                />
               </q-item-section>
               <q-item-section>
                 <q-item-label>owley</q-item-label>
@@ -201,7 +265,11 @@
 
             <q-item :disable="is_updating" tag="label" v-ripple>
               <q-item-section avatar>
-                <q-radio v-model="bot_avatar" val="diaspora" color="pink" />
+                <q-radio
+                  v-model="bot_avatar"
+                  val="diaspora"
+                  :color="primary_color"
+                />
               </q-item-section>
               <q-item-section>
                 <q-item-label>diaspora</q-item-label>
@@ -278,7 +346,7 @@
 
       <q-separator />
       <q-card-actions align="right">
-        <q-btn v-close-popup outline color="pink" label="Okay" />
+        <q-btn v-close-popup outline :color="primary_color" label="Okay" />
       </q-card-actions>
     </q-card>
   </q-dialog>
@@ -306,6 +374,7 @@ export default defineComponent({
       premium_tf: false,
       show_ai_avatars: false,
       is_stripe_customer: false,
+      primary_color: "pink",
     };
   },
   computed: {
@@ -362,6 +431,9 @@ export default defineComponent({
   },
   created: function () {
     var vm = this; // vm = view model, the vue instance
+    if (localStorage.getItem("primary_color") != null) {
+      vm.primary_color = localStorage.primary_color;
+    }
     if (localStorage.user_id) {
       vm.user_id = localStorage.user_id;
       vm.is_signed_in = true;
@@ -432,6 +504,13 @@ export default defineComponent({
       vm.show_avatars = false;
       vm.updateSettings();
     },
+    set_color: function () {
+      var vm = this;
+
+      // vm.avatar = avatar_name;
+      // vm.show_avatars = false;
+      vm.updateSettings();
+    },
     updateSettings: function () {
       var vm = this;
       vm.is_failure = false;
@@ -440,6 +519,7 @@ export default defineComponent({
         "Content-Type": "application/json",
         Authorization: "Bearer " + localStorage.token,
       };
+      console.log(vm.primary_color);
       //axios.post(`http://localhost:3000/users/${localStorage.user_id}/settings`, {
       axios
         .post(
@@ -447,6 +527,7 @@ export default defineComponent({
           {
             bot_avatar: vm.bot_avatar,
             avatar: vm.avatar,
+            primary_color: vm.primary_color,
           },
           {
             headers: api_headers,
@@ -492,6 +573,7 @@ export default defineComponent({
 
             vm.bot_avatar = response.data.bot_avatar;
             vm.avatar = response.data.avatar;
+            vm.primary_color = response.data.primary_color;
           })
           .catch(function (error) {
             // handle error

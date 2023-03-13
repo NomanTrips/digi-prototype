@@ -1,7 +1,7 @@
 <template>
   <q-layout view="lHh Lpr lFf">
     <q-header elevated>
-      <q-toolbar class="bg-pink">
+      <q-toolbar :class="toolbarClass">
         <q-toolbar-title>
           <router-link to="/" style="text-decoration: none; color: white"
             >Digissist</router-link
@@ -63,7 +63,7 @@
                 <div class="text-h6 q-mb-md">Choose AI skin:</div>
                 <div v-show="is_updating">
                   Saving...
-                  <q-spinner color="pink" size="2em" />
+                  <q-spinner :color="primary_color" size="2em" />
                 </div>
 
                 <q-list dense>
@@ -78,7 +78,7 @@
                       <q-radio
                         v-model="bot_avatar"
                         val="default"
-                        color="pink"
+                        :color="primary_color"
                       />
                     </q-item-section>
                     <q-item-section>
@@ -96,7 +96,7 @@
                       <q-radio
                         v-model="bot_avatar"
                         val="green_spark"
-                        color="pink"
+                        :color="primary_color"
                       />
                     </q-item-section>
                     <q-item-section>
@@ -129,7 +129,11 @@
 -->
                   <q-item :disable="is_updating" tag="label" v-ripple>
                     <q-item-section avatar>
-                      <q-radio v-model="bot_avatar" val="owley" color="pink" />
+                      <q-radio
+                        v-model="bot_avatar"
+                        val="owley"
+                        :color="primary_color"
+                      />
                     </q-item-section>
                     <q-item-section>
                       <q-item-label>owley</q-item-label>
@@ -262,7 +266,7 @@
                   -->
                   <div class="row justify-center q-ma-md">
                     <q-btn
-                      color="pink"
+                      :color="primary_color"
                       label="Settings"
                       outline
                       size="sm"
@@ -275,7 +279,7 @@
                   <div class="row justify-center q-ma-md">
                     <q-btn
                       label="Logout"
-                      color="pink"
+                      :color="primary_color"
                       outline
                       size="sm"
                       v-close-popup
@@ -284,7 +288,6 @@
                       class="q-mx-xs"
                       style="width: 108px"
                     >
-                      <q-tooltip> Logout </q-tooltip>
                     </q-btn>
                   </div>
                 </div>
@@ -345,7 +348,12 @@
 
               <q-separator />
               <q-card-actions align="right">
-                <q-btn v-close-popup outline color="pink" label="Okay" />
+                <q-btn
+                  v-close-popup
+                  outline
+                  :color="primary_color"
+                  label="Okay"
+                />
               </q-card-actions>
             </q-card>
           </q-dialog>
@@ -465,9 +473,13 @@ export default defineComponent({
       prompt_progress: 0.0,
       intervalID: null,
       signup_hint: "",
+      primary_color: "pink",
     };
   },
   computed: {
+    toolbarClass() {
+      return `bg-${this.primary_color}`;
+    },
     screenSize() {
       return this.$q.screen.width;
     },
@@ -501,6 +513,9 @@ export default defineComponent({
   created: function () {
     //console.log(`masthead create`)
     var vm = this; // vm = view model, the vue instance
+    if (localStorage.getItem("primary_color") != null) {
+      vm.primary_color = localStorage.primary_color;
+    }
     if (localStorage.user_id) {
       vm.user_id = localStorage.user_id;
       vm.is_signed_in = true;
@@ -609,6 +624,7 @@ export default defineComponent({
       localStorage.removeItem("premium_tf");
       localStorage.removeItem("bot_avatar");
       localStorage.removeItem("avatar");
+      localStorage.removeItem("primary_color");
       vm.is_signed_in = false;
       window.location.reload();
     },
@@ -627,6 +643,7 @@ export default defineComponent({
           {
             bot_avatar: vm.bot_avatar,
             avatar: vm.avatar,
+            primary_color: vm.primary_color,
           },
           {
             headers: api_headers,
@@ -670,9 +687,11 @@ export default defineComponent({
             // handle success
             vm.bot_avatar = response.data.bot_avatar;
             vm.avatar = response.data.avatar;
+            vm.primary_color = response.data.primary_color;
             // save avatars to local storage for quick access later
             localStorage.bot_avatar = response.data.bot_avatar;
             localStorage.avatar = response.data.avatar;
+            localStorage.primary_color = response.data.primary_color;
           })
           .catch(function (error) {
             // handle error

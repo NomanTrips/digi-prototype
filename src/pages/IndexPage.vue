@@ -17,7 +17,9 @@
                 :name="message.sender"
                 :text="[message.message_text]"
                 :sent="message.sender != 'AI'"
-                :bg-color="message.sender == 'AI' ? 'pink' : 'light-grey'"
+                :bg-color="
+                  message.sender == 'AI' ? primary_color : 'light-grey'
+                "
                 :text-color="message.sender == 'AI' ? 'white' : 'black'"
                 :text-html="message.is_code"
               >
@@ -59,7 +61,7 @@
             v-show="toggle_spinner"
             name="AI"
             :avatar="getBotAvatarPath"
-            bg-color="pink"
+            :bg-color="primary_color"
             text-color="white"
           >
             <q-spinner-dots size="2rem" />
@@ -89,7 +91,7 @@
             <q-input
               v-model="user_input"
               outlined
-              color="pink"
+              :color="primary_color"
               autogrow
               :disable="toggle_spinner"
               :placeholder="show_prefix ? '[Insert Text Here]' : ''"
@@ -120,7 +122,7 @@
             <q-btn
               :size="screenSize > 600 ? 'md' : 'sm'"
               outline
-              color="pink"
+              :color="primary_color"
               icon="psychology"
               @click="show_templates = true"
               class="q-mx-xs q-mb-md"
@@ -129,7 +131,7 @@
             <q-btn
               :size="screenSize > 600 ? 'md' : 'sm'"
               outline
-              color="pink"
+              :color="primary_color"
               icon="text_snippet"
               @click="card = true"
               class="q-mx-xs q-mb-md"
@@ -138,7 +140,7 @@
             <q-btn
               :size="screenSize > 600 ? 'md' : 'sm'"
               outline
-              color="pink"
+              :color="primary_color"
               icon="settings"
               @click="show_settings = true"
               class="q-mx-xs q-mb-md"
@@ -146,7 +148,7 @@
             <q-chip
               dense
               class="q-mx-xs q-mb-md"
-              :color="getTokenCount > 1024 ? 'pink' : 'light-grey'"
+              :color="getTokenCount > 1024 ? primary_color : 'light-grey'"
               :text-color="getTokenCount > 1024 ? 'white' : 'grey-6'"
               :size="screenSize > 600 ? 'md' : 'sm'"
             >
@@ -167,7 +169,7 @@
                   <q-input
                     v-model="selected_template.text"
                     outlined
-                    color="pink"
+                    :color="primary_color"
                     type="textarea"
                     autogrow
                     @focus="user_input = ''"
@@ -178,7 +180,12 @@
 
               <q-separator />
               <q-card-actions align="right">
-                <q-btn v-close-popup outline color="pink" label="Okay" />
+                <q-btn
+                  v-close-popup
+                  outline
+                  :color="primary_color"
+                  label="Okay"
+                />
               </q-card-actions>
             </q-card>
           </q-dialog>
@@ -195,7 +202,7 @@
                     v-model="ai_model_engine"
                     :options="ai_model_engines"
                     label="GPT-3 model engine"
-                    color="pink"
+                    :color="primary_color"
                     bottom-slots
                     :hide-hint="premium_tf"
                   >
@@ -217,7 +224,12 @@
 
               <q-separator />
               <q-card-actions align="right">
-                <q-btn v-close-popup outline color="pink" label="Okay" />
+                <q-btn
+                  v-close-popup
+                  outline
+                  :color="primary_color"
+                  label="Okay"
+                />
               </q-card-actions>
             </q-card>
           </q-dialog>
@@ -241,7 +253,7 @@
                         <q-radio
                           v-model="selected_template_key"
                           :val="template.value"
-                          color="pink"
+                          :color="primary_color"
                         />
                       </q-item-section>
                       <q-item-section>
@@ -261,7 +273,7 @@
                         <q-radio
                           v-model="selected_template_key"
                           :val="template.value"
-                          color="pink"
+                          :color="primary_color"
                         />
                       </q-item-section>
                       <q-item-section>
@@ -281,7 +293,7 @@
                         <q-radio
                           v-model="selected_template_key"
                           :val="template.value"
-                          color="pink"
+                          :color="primary_color"
                         />
                       </q-item-section>
                       <q-item-section>
@@ -343,6 +355,7 @@ export default defineComponent({
       is_signed_in: true,
       avatar: null,
       bot_avatar: null,
+      primary_color: null,
       is_loading: false,
       message_prefix: "",
       prompt_type: "generic_conversation",
@@ -502,6 +515,9 @@ export default defineComponent({
     if (localStorage.getItem("avatar") != null) {
       vm.avatar = localStorage.avatar;
     }
+    if (localStorage.getItem("primary_color") != null) {
+      vm.primary_color = localStorage.primary_color;
+    }
     if (localStorage.user_id) {
       this.user_id = localStorage.user_id;
       this.is_signed_in = true;
@@ -510,6 +526,7 @@ export default defineComponent({
       // set some default skins
       vm.bot_avatar = "owley";
       vm.avatar = "human_1";
+      vm.primary_color = "pink";
     }
     // vm.loadTemplate("Conversation");
 
@@ -784,9 +801,11 @@ export default defineComponent({
             // handle success
             vm.bot_avatar = response.data.bot_avatar;
             vm.avatar = response.data.avatar;
+            vm.primary_color = response.data.primary_color;
             // save avatars to local storage for quick access later
             localStorage.bot_avatar = response.data.bot_avatar;
             localStorage.avatar = response.data.avatar;
+            localStorage.primary_color = response.data.primary_color;
           })
           .catch(function (error) {
             // handle error

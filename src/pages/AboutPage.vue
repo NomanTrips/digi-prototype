@@ -3,7 +3,7 @@
     <div style="width: 100%; max-width: 700px">
       <q-card class="my-card">
         <q-card-section>
-          <h6 class="text-pink q-my-md">About Digissist</h6>
+          <h6 :class="textClass">About Digissist</h6>
           <div class="text-body2 text-left">
             Digissist is a user interface to help people and AI's interact in a
             fun and productive way. Think of it as a 'skin' for AI systems.
@@ -15,7 +15,7 @@
               or train the AI models.
             </p>
           </div>
-          <h6 class="text-pink q-my-md">Contact</h6>
+          <h6 :class="textClass">Contact</h6>
           <div class="row">
             <a>admin@digissist.io</a>
           </div>
@@ -23,11 +23,11 @@
             <q-btn
               outline
               label="Submit feedback"
-              color="pink"
+              :color="primary_color"
               to="/feedback"
             />
           </div>
-          <h6 class="text-pink q-my-md">Usage policy</h6>
+          <h6 :class="textClass">Usage policy</h6>
           <div class="row">
             <b>Interact with the AI responsibly:</b>
 
@@ -78,10 +78,19 @@ export default defineComponent({
       is_failure: false,
       err_msg: "",
       subscription_status: "",
+      primary_color: "pink",
     };
+  },
+  computed: {
+    textClass() {
+      return `text-${this.primary_color} q-my-md`;
+    },
   },
   created: function () {
     var vm = this; // vm = view model, the vue instance'
+    if (localStorage.getItem("primary_color") != null) {
+      vm.primary_color = localStorage.primary_color;
+    }
   },
   methods: {},
 });
