@@ -4,6 +4,7 @@
       <q-card class="my-card" style="margin-bottom: 15px">
         <q-card-section style="padding: 10px">
           <div
+            v-show="ai_model_engine != 'gpt-3.5-turbo'"
             v-for="message in convo_json.messages"
             :key="message.messageId"
             :class="
@@ -53,6 +54,62 @@
                 align="center"
                 style="width: 16px; height: 16px; margin-top: 20px"
                 @click="updateClipboard(message.message_text)"
+              ></q-btn>
+            </div>
+          </div>
+
+          <div
+            v-show="ai_model_engine == 'gpt-3.5-turbo'"
+            v-for="message in messages"
+            :key="message.content"
+            :class="
+              message.role == 'assistant'
+                ? 'row justify-start no-wrap'
+                : 'row justify-end no-wrap'
+            "
+          >
+            <div class="col-shrink">
+              <q-chat-message
+                v-show="message.role != 'system'"
+                :name="message.role == 'assistant' ? 'AI' : 'Human'"
+                :text="[message.content]"
+                :sent="message.role != 'assistant'"
+                :bg-color="
+                  message.role == 'assistant' ? primary_color : 'light-grey'
+                "
+                :text-color="message.role == 'assistant' ? 'white' : 'black'"
+                :text-html="false"
+              >
+                <template v-slot:avatar="props">
+                  <q-avatar
+                    :size="screenSize > 600 ? '58px' : '48px'"
+                    :props="props"
+                    class="q-mx-xs"
+                  >
+                    <img
+                      v-show="message.role == 'assistant'"
+                      :src="getBotAvatarPath"
+                    />
+                    <img
+                      :v-show="message.role != 'assistant'"
+                      :src="getHumanAvatarPath"
+                    />
+                  </q-avatar>
+                </template>
+              </q-chat-message>
+            </div>
+            <div
+              class="col-auto"
+              v-show="message.role == 'assistant' && screenSize > 600"
+            >
+              <q-btn
+                flat
+                round
+                size="xs"
+                icon="content_copy"
+                align="center"
+                style="width: 16px; height: 16px; margin-top: 20px"
+                @click="updateClipboard(message.content)"
               ></q-btn>
             </div>
           </div>
@@ -109,6 +166,17 @@
                   icon="send"
                   @click="send_message"
                   :disable="is_error"
+                  v-show="ai_model_engine != 'gpt-3.5-turbo'"
+                />
+                <q-btn
+                  :size="screenSize > 600 ? 'md' : 'sm'"
+                  round
+                  dense
+                  flat
+                  icon="send"
+                  @click="send_message_gpt_turbo"
+                  :disable="is_error"
+                  v-show="ai_model_engine == 'gpt-3.5-turbo'"
                 />
               </template>
               <template v-slot:error>
@@ -118,43 +186,57 @@
           </div>
         </q-card-section>
         <q-card-actions align="around">
-          <div class="row justify-center">
-            <q-btn
-              :size="screenSize > 600 ? 'md' : 'sm'"
-              outline
-              :color="primary_color"
-              icon="psychology"
-              @click="show_templates = true"
-              class="q-mx-xs q-mb-md"
-              >Tasks</q-btn
-            >
-            <q-btn
-              :size="screenSize > 600 ? 'md' : 'sm'"
-              outline
-              :color="primary_color"
-              icon="text_snippet"
-              @click="card = true"
-              class="q-mx-xs q-mb-md"
-              >View prompt</q-btn
-            >
-            <q-btn
-              :size="screenSize > 600 ? 'md' : 'sm'"
-              outline
-              :color="primary_color"
-              icon="settings"
-              @click="show_settings = true"
-              class="q-mx-xs q-mb-md"
-            ></q-btn>
-            <q-chip
-              dense
-              class="q-mx-xs q-mb-md"
-              :color="getTokenCount > 1024 ? primary_color : 'light-grey'"
-              :text-color="getTokenCount > 1024 ? 'white' : 'grey-6'"
-              :size="screenSize > 600 ? 'md' : 'sm'"
-            >
-              {{ getTokenCount }}/1024
-              <q-tooltip>Token limit</q-tooltip>
-            </q-chip>
+          <div
+            class="row justify-center"
+            style="width: 100%; text-align: center"
+          >
+            <div class="col">
+              <q-btn
+                :size="screenSize > 600 ? 'md' : 'sm'"
+                outline
+                :color="primary_color"
+                icon="psychology"
+                @click="show_templates = true"
+                class="q-mx-xs q-mb-md"
+                v-show="ai_model_engine != 'gpt-3.5-turbo'"
+                >Tasks</q-btn
+              >
+              <q-btn
+                :size="screenSize > 600 ? 'md' : 'sm'"
+                outline
+                :color="primary_color"
+                icon="text_snippet"
+                @click="card = true"
+                class="q-mx-xs q-mb-md"
+                >View prompt</q-btn
+              >
+              <q-btn
+                :size="screenSize > 600 ? 'md' : 'sm'"
+                outline
+                :color="primary_color"
+                icon="settings"
+                @click="show_settings = true"
+                class="q-mx-xs q-mb-md"
+              ></q-btn>
+              <q-chip
+                dense
+                class="q-mx-xs q-mb-md"
+                :color="
+                  token_count + Math.round(user_input.length / 4) > 4096
+                    ? primary_color
+                    : 'light-grey'
+                "
+                :text-color="
+                  token_count + Math.round(user_input.length / 4) > 4096
+                    ? 'white'
+                    : 'grey-6'
+                "
+                :size="screenSize > 600 ? 'md' : 'sm'"
+              >
+                {{ token_count + Math.round(user_input.length / 4) }}/4096
+                <q-tooltip>Token limit</q-tooltip>
+              </q-chip>
+            </div>
           </div>
           <div class="row justify-center text-caption" style="color: goldenrod">
             Interacting with an AI system: verify the output carefully.
@@ -360,6 +442,7 @@ export default defineComponent({
       message_prefix: "",
       prompt_type: "generic_conversation",
       ai_model_engines: [
+        "gpt-3.5-turbo",
         "text-davinci-003",
         "text-davinci-002",
         "text-curie-001",
@@ -451,21 +534,28 @@ export default defineComponent({
       premium_tf: false,
       error_message: "",
       is_error: false,
+      messages: [
+        {
+          role: "system",
+          content:
+            "You are ChatGPT, a large language model trained by OpenAI. Answer as concisely as possible.",
+        },
+        { role: "user", content: "Hello, who are you?" },
+        {
+          role: "assistant",
+          content: "I am ChatGPT created by OpenAI. How can I help you today?",
+        },
+      ],
+      token_count: 0,
       //user_setting:{
       //  bot_avatar: 'robot_1',
-      //},
+      //}, Hello, who are you?
     };
   },
   computed: {
     // a computed getter
     screenSize() {
       return this.$q.screen.width;
-    },
-    getTokenCount() {
-      var vm = this;
-      return Math.round(
-        (vm.selected_template.text.length + vm.user_input.length) / 4
-      );
     },
     getBotAvatarPath() {
       var vm = this;
@@ -539,7 +629,11 @@ export default defineComponent({
         // hack to send the message when hitting 'enter' since the input is a text area
         if (vm.user_input != "") {
           vm.$refs.userinput.blur();
-          vm.send_message();
+          if (vm.ai_model_engine != "gpt-3.5-turbo") {
+            vm.send_message();
+          } else {
+            vm.send_message_gpt_turbo();
+          }
         }
       }
     }
@@ -547,6 +641,7 @@ export default defineComponent({
       vm.premium_tf = true;
     }
 
+    /*
     if (!vm.premium_tf) {
       // only premium users can access davinci
       vm.ai_model_engines = _.slice(
@@ -556,9 +651,17 @@ export default defineComponent({
       );
       vm.ai_model_engine = "text-curie-001";
     }
+    */
+    vm.token_count += Math.round(vm.selected_template.text.length / 4);
   },
   mounted() {},
   watch: {
+    ai_model_engine(model) {
+      var vm = this;
+      if (model == "gpt-3.5-turbo") {
+        vm.token_count = 42;
+      }
+    },
     selected_template_key(key) {
       // set the selected template based on radio selection
       var vm = this;
@@ -592,7 +695,7 @@ export default defineComponent({
     user_input(input) {
       var vm = this;
       if (input != null) {
-        if (input.length > 1000) {
+        if (input.length > 5000) {
           vm.is_error = true;
           vm.error_message = "Input is too big. Try something smaller";
         } else {
@@ -600,13 +703,10 @@ export default defineComponent({
           vm.error_message = "";
         }
       }
-    },
-    getTokenCount(count) {
-      var vm = this;
-      if (count > 1024) {
+      if (vm.token_count + Math.round(vm.user_input.length / 4) > 4096) {
         vm.is_error = true;
         vm.error_message =
-          "Token limit reached. Refresh the page to start a new conversation.";
+          "Token count reached, please refresh the page to start a new conversation.";
       }
     },
     name(user_id) {
@@ -678,6 +778,51 @@ export default defineComponent({
       var vm = this;
       console.log(vm.user_input);
     },
+    send_message_gpt_turbo: function () {
+      var vm = this;
+      vm.toggle_spinner = true;
+      console.log(vm.messages);
+      vm.messages.push({ role: "user", content: vm.user_input });
+      vm.user_input = "";
+      axios
+        .post(
+          `${process.env.API}/completions/v2`,
+          {
+            model: vm.ai_model_engine,
+            messages: vm.messages,
+            max_tokens: 150,
+            temperature: 0.9,
+            top_p: 1,
+            n: 1,
+            frequency_penalty: 0.0,
+            presence_penalty: 0.6,
+            stream: false,
+            user: String(vm.user_id),
+          },
+          {
+            headers: {
+              Authorization: "Bearer " + localStorage.token,
+              "Content-Type": "application/json",
+            },
+          }
+        )
+        .then(function (response) {
+          vm.messages.push({
+            role: "assistant",
+            content: response.data.choices[0].message.content,
+          });
+          const element = document.getElementById("inputbox");
+          element.scrollIntoView();
+          vm.token_count = response.data.usage.total_tokens;
+        })
+        .catch(function (error) {
+          console.log(error);
+        })
+        .then(function () {
+          // always executed
+          vm.toggle_spinner = false;
+        });
+    },
     send_message: function () {
       var vm = this;
       if (vm.show_prefix) {
@@ -708,7 +853,7 @@ export default defineComponent({
         .post(
           `${process.env.API}/completions`,
           {
-            engine: vm.ai_model_engine,
+            model: vm.ai_model_engine,
             prompt: vm.selected_template.text,
             max_tokens: 150,
             temperature: 0.9,
@@ -735,6 +880,7 @@ export default defineComponent({
             message_text: String(response.data.choices[0].text),
             is_code: false,
           };
+          vm.token_count = response.data.usage.total_tokens;
           vm.toggle_spinner = false;
           vm.selected_template.text =
             String(vm.selected_template.text) +
