@@ -72,13 +72,13 @@
               <q-chat-message
                 v-show="message.role != 'system'"
                 :name="message.role == 'assistant' ? 'AI' : 'Human'"
-                :text="[message.content]"
+                :text="[wrapMessage(message.content)]"
                 :sent="message.role != 'assistant'"
                 :bg-color="
                   message.role == 'assistant' ? primary_color : 'light-grey'
                 "
                 :text-color="message.role == 'assistant' ? 'white' : 'black'"
-                :text-html="false"
+                :text-html="true"
               >
                 <template v-slot:avatar="props">
                   <q-avatar
@@ -599,6 +599,7 @@ export default defineComponent({
   created: function () {
     var vm = this; // vm = view model, the vue instance
     vm.convo_json = _.cloneDeep(TestJson);
+    vm.ai_model_engine = "gpt-3.5-turbo";
     if (localStorage.getItem("bot_avatar") != null) {
       vm.bot_avatar = localStorage.bot_avatar;
     }
@@ -715,6 +716,9 @@ export default defineComponent({
     },
   },
   methods: {
+    wrapMessage(message) {
+      return `<div style="white-space:pre-wrap;">${message}</div>`;
+    },
     removeTags(str) {
       return str.replace(/<\/?pre[^>]*>|<\/?code>/gi, "");
     },
