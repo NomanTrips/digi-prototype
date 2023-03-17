@@ -18,7 +18,7 @@
             class="q-mx-xs"
           />
           <q-btn
-            v-show="is_signed_in === false"
+            v-show="is_signed_in === false || temp_account_tf === true"
             icon="login"
             aria-label="login"
             to="/login"
@@ -30,10 +30,10 @@
           />
 
           <q-btn
-            v-show="is_signed_in === false"
+            v-show="is_signed_in === false || temp_account_tf === true"
             aria-label="signup"
             to="/signup"
-            label="Sign up"
+            label="Create Account"
             outline
             color="white"
             :size="screenSize > 600 ? 'sm' : 'xs'"
@@ -48,7 +48,7 @@
             to="/upgrade"
             :size="screenSize > 600 ? 'sm' : 'xs'"
             class="q-mx-xs"
-            v-show="is_signed_in && !premium_tf"
+            v-show="is_signed_in && !premium_tf && !temp_account_tf"
           />
           <q-btn-dropdown
             v-show="is_signed_in === true"
@@ -235,8 +235,17 @@
                   <q-tooltip> Pick an Avatar </q-tooltip>
                 </q-btn>
 
-                <div class="row justify-center text-caption">
+                <div
+                  class="row justify-center text-caption"
+                  v-show="!temp_account_tf"
+                >
                   {{ username }}
+                </div>
+                <div
+                  class="row justify-center text-caption"
+                  v-show="temp_account_tf"
+                >
+                  Temp account
                 </div>
                 <div
                   class="text-subtitle1 q-mt-md q-mb-xs"
@@ -474,6 +483,8 @@ export default defineComponent({
       intervalID: null,
       signup_hint: "",
       primary_color: "pink",
+      temp_account_tf: true,
+      update_value: "",
     };
   },
   computed: {
@@ -511,7 +522,6 @@ export default defineComponent({
     },
   },
   created: function () {
-    //console.log(`masthead create`)
     var vm = this; // vm = view model, the vue instance
     if (localStorage.getItem("primary_color") != null) {
       vm.primary_color = localStorage.primary_color;
@@ -526,6 +536,13 @@ export default defineComponent({
       vm.premium_tf = true;
     }
 
+    if (localStorage.getItem("temp_account_tf") != null) {
+      if (localStorage.temp_account_tf === "false") {
+        vm.temp_account_tf = false;
+      }
+    }
+
+    /*
     if (vm.$router.currentRoute._value.path === "/") {
       // only show the hint on the main page
       if (!vm.is_signed_in) {
@@ -540,9 +557,11 @@ export default defineComponent({
         }, 30000);
       }
     }
+    */
   },
   mounted() {
     //console.log(`the masthead is now mounted.`)
+    // EventBus.$on("signedin", this.refresh_layout);
   },
   updated() {
     //console.log(`masthead update`)
@@ -575,6 +594,11 @@ export default defineComponent({
     },
   },
   methods: {
+    refresh_layout: function () {
+      // vm.$router.push("/");
+      this.update_value = true;
+      console.log("refreshing the layout");
+    },
     prompt_timer: function () {
       var vm = this;
       vm.show_signup_hint = true;
@@ -625,6 +649,7 @@ export default defineComponent({
       localStorage.removeItem("bot_avatar");
       localStorage.removeItem("avatar");
       localStorage.removeItem("primary_color");
+      localStorage.removeItem("temp_account_tf");
       vm.is_signed_in = false;
       window.location.reload();
     },

@@ -110,9 +110,9 @@ export default defineComponent({
   },
   mounted: function () {
     var vm = this;
-    if (vm.is_signed_in) {
-      vm.$router.push("/");
-    }
+    //if (vm.is_signed_in) {
+    //  vm.$router.push("/");
+    // }
   },
   methods: {
     get_billing_details: function (callback) {
@@ -166,6 +166,7 @@ export default defineComponent({
             localStorage.user_id = response.data.user_id;
             localStorage.token = response.data.token;
             localStorage.username = response.data.username;
+            localStorage.temp_account_tf = false;
             vm.is_signed_in = true;
             //vm.$root.$forceUpdate();
             //console.log(vm.$parent.name);
@@ -173,6 +174,7 @@ export default defineComponent({
             vm.get_billing_details(function () {
               window.location.reload();
             });
+            vm.$router.push("/");
           } else {
             vm.is_failure = true;
             vm.err_msg = "Unknown";

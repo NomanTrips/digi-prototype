@@ -7,9 +7,9 @@
             Succesfully upgraded to premium!
           </h6>
           <div class="text-body2 text-center">
-            Enjoy talking to the smartest AI of the GPT-3 family: Davinci. Also
-            checkout the premium avatars and AI skins under the user settings
-            (Accessible via the user setting dropdown).
+            Enjoy unlimited conversations with ChatGPT! Also checkout the
+            premium avatars and AI skins under the user settings (Accessible via
+            the user setting dropdown).
           </div>
           <div class="row justify-center">
             <q-btn

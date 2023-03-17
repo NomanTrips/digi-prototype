@@ -260,6 +260,7 @@ export default defineComponent({
             username: vm.username,
             password: vm.password,
             email: vm.email,
+            temp_account_tf: false,
           },
           {
             headers: api_headers,
@@ -271,6 +272,7 @@ export default defineComponent({
             localStorage.user_id = response.data.user_id;
             localStorage.token = response.data.token;
             localStorage.username = response.data.username;
+            localStorage.temp_account_tf = response.data.temp_account_tf;
             vm.$router.push("/");
           } else {
             vm.is_failure = true;

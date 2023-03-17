@@ -547,6 +547,7 @@ export default defineComponent({
         },
       ],
       token_count: 0,
+      temp_account_tf: true,
       //user_setting:{
       //  bot_avatar: 'robot_1',
       //}, Hello, who are you?
@@ -600,28 +601,48 @@ export default defineComponent({
     var vm = this; // vm = view model, the vue instance
     vm.convo_json = _.cloneDeep(TestJson);
     vm.ai_model_engine = "gpt-3.5-turbo";
+
+    // set default skins incase setting retrieval takes time or new user
     if (localStorage.getItem("bot_avatar") != null) {
       vm.bot_avatar = localStorage.bot_avatar;
+    } else {
+      vm.bot_avatar = "owley";
     }
     if (localStorage.getItem("avatar") != null) {
       vm.avatar = localStorage.avatar;
+    } else {
+      vm.avatar = "human_1";
     }
     if (localStorage.getItem("primary_color") != null) {
       vm.primary_color = localStorage.primary_color;
+    } else {
+      vm.primary_color = "pink";
     }
+    if (localStorage.getItem("temp_account_tf") != null) {
+      vm.temp_account_tf = localStorage.temp_account_tf;
+    } else {
+      vm.temp_account_tf = true;
+    }
+    // get settings
     if (localStorage.user_id) {
+      // regular or temp user
       this.user_id = localStorage.user_id;
       this.is_signed_in = true;
       vm.getSettings();
     } else {
-      // set some default skins
-      vm.bot_avatar = "owley";
-      vm.avatar = "human_1";
-      vm.primary_color = "pink";
+      // new site visiter
+      var user_uuid = uuidv4();
+      // create temp user
+      vm.createUser(
+        "temp",
+        "user",
+        "t",
+        user_uuid,
+        user_uuid,
+        `${user_uuid}@digissist.io`,
+        1
+      );
     }
-    // vm.loadTemplate("Conversation");
-
-    //const log = document.getElementById('userinput'); this is broke... should be in mounted
 
     document.addEventListener("keydown", logKey);
     function logKey(e) {
@@ -653,7 +674,8 @@ export default defineComponent({
       vm.ai_model_engine = "text-curie-001";
     }
     */
-    vm.token_count += Math.round(vm.selected_template.text.length / 4);
+    // vm.token_count += Math.round(vm.selected_template.text.length / 4);
+    vm.token_count = 42;
   },
   mounted() {},
   watch: {
@@ -785,7 +807,7 @@ export default defineComponent({
     send_message_gpt_turbo: function () {
       var vm = this;
       vm.toggle_spinner = true;
-      console.log(vm.messages);
+      // console.log(vm.messages);
       vm.messages.push({ role: "user", content: vm.user_input });
       vm.user_input = "";
       axios
@@ -821,6 +843,8 @@ export default defineComponent({
         })
         .catch(function (error) {
           console.log(error);
+          vm.is_error = true;
+          vm.error_message = error.response.data;
         })
         .then(function () {
           // always executed
@@ -972,6 +996,56 @@ export default defineComponent({
             vm.is_loading = false;
           });
       }
+    },
+    createUser: function (
+      fname,
+      lname,
+      mi,
+      username,
+      pw,
+      email,
+      temp_account_tf
+    ) {
+      var vm = this;
+      vm.is_failure = false;
+      vm.dob = "19880719";
+      console.log(vm.dob);
+      const api_headers = {
+        "Content-Type": "application/json",
+      };
+      axios
+        .post(
+          `${process.env.API}/users/create`,
+          {
+            first_name: fname,
+            middle_initial: mi,
+            last_name: lname,
+            date_of_birth: vm.dob,
+            username: username,
+            password: pw,
+            email: email,
+            temp_account_tf: temp_account_tf,
+          },
+          {
+            headers: api_headers,
+          }
+        )
+        .then(function (response) {
+          console.log(response);
+          if (response.status === 200) {
+            localStorage.user_id = response.data.user_id;
+            localStorage.token = response.data.token;
+            localStorage.username = response.data.username;
+            localStorage.temp_account_tf = response.data.temp_account_tf;
+            vm.$router.push("/");
+          } else {
+            vm.is_failure = true;
+          }
+        })
+        .catch(function (error) {
+          console.log(error);
+          vm.is_failure = true;
+        });
     },
   },
   setup() {

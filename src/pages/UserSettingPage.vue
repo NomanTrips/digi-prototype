@@ -25,7 +25,15 @@
             </q-btn>
           </div>
 
-          <div class="row justify-center text-caption">{{ username }}</div>
+          <div
+            class="row justify-center text-caption"
+            v-show="!temp_account_tf"
+          >
+            {{ username }}
+          </div>
+          <div class="row justify-center text-caption" v-show="temp_account_tf">
+            Temp account
+          </div>
 
           <div class="row justify-center text-subtitle1 q-mt-md q-mb-xs">
             <b>Account type:</b>
@@ -375,6 +383,7 @@ export default defineComponent({
       show_ai_avatars: false,
       is_stripe_customer: false,
       primary_color: "pink",
+      temp_account_tf: true,
     };
   },
   computed: {
@@ -438,6 +447,9 @@ export default defineComponent({
       vm.user_id = localStorage.user_id;
       vm.is_signed_in = true;
       vm.username = localStorage.username;
+    }
+    if (localStorage.getItem("temp_account_tf") != null) {
+      vm.temp_account_tf = localStorage.temp_account_tf;
     }
     vm.get_billing_details();
     vm.getSettings();
@@ -535,12 +547,15 @@ export default defineComponent({
         )
         .then(function (response) {
           console.log(response);
+          //location.reload();
+          /*
           if (response.status === 200) {
-            vm.$router.go();
+            vm.$router.go(vm.$route.name);
           } else {
             vm.is_failure = true;
             vm.err_msg = "Failed to update setting";
           }
+          */
         })
         .catch(function (error) {
           console.log(error);

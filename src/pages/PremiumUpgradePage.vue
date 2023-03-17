@@ -20,8 +20,7 @@
             Upgrade to Premium!
           </h6>
           <div class="text-body2 text-center">
-            Premium users can talk to Davinci: the smartest AI of the GPT-3
-            family. They also get access to premium AI skins.
+            Premium users get unlimited tokens and access to premium AI avatars.
           </div>
 
           <div class="q-pa-md">
@@ -41,6 +40,7 @@
               icon="shopping_cart"
               @click="checkout"
               class="q-ma-md"
+              :disable="temp_account_tf"
               >Checkout</q-btn
             >
           </div>
@@ -96,15 +96,15 @@ const columns = [
 const rows = [
   {
     name: "Premium",
-    ai_models: "GPT-3 Davinci",
+    ai_models: "GPT-3.5 Turbo/ChatGPT",
     token_limit: "Unlimited",
     ai_skins: "Yes",
     price: "5$/month",
   },
   {
     name: "Free",
-    ai_models: "GPT-3 Curie",
-    token_limit: "5000 per month",
+    ai_models: "GPT-3.5 Turbo/ChatGPT",
+    token_limit: "25,000 per month",
     ai_skins: "No",
     price: "Free",
   },
@@ -116,10 +116,12 @@ export default defineComponent({
     return {
       is_failure: false,
       err_msg: "",
+      temp_account_tf: true,
     };
   },
   created: function () {
     var vm = this; // vm = view model, the vue instance
+    vm.temp_account_tf = localStorage.getItem("temp_account_tf");
   },
   methods: {
     checkout: function () {
