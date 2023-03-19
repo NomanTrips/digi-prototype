@@ -547,7 +547,12 @@ export default defineComponent({
         )
         .then(function (response) {
           console.log(response);
-          //location.reload();
+          vm.emitter.emit("setting_change", {
+            is_setting_changed: true,
+            primary_color: vm.primary_color,
+          });
+          // location.replace("/");
+          // location.reload();
           /*
           if (response.status === 200) {
             vm.$router.go(vm.$route.name);

@@ -485,6 +485,7 @@ export default defineComponent({
       primary_color: "pink",
       temp_account_tf: true,
       update_value: "",
+      is_setting_changed: false,
     };
   },
   computed: {
@@ -560,6 +561,10 @@ export default defineComponent({
     */
   },
   mounted() {
+    this.emitter.on("setting_change", (e) => {
+      this.is_setting_changed = e.is_setting_changed;
+      this.primary_color = e.primary_color;
+    });
     //console.log(`the masthead is now mounted.`)
     // EventBus.$on("signedin", this.refresh_layout);
   },
