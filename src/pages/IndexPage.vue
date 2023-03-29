@@ -60,7 +60,7 @@
 
           <div
             v-show="ai_model_engine == 'gpt-3.5-turbo'"
-            v-for="message in messages"
+            v-for="message in messages_html"
             :key="message.content"
             :class="
               message.role == 'assistant'
@@ -71,15 +71,17 @@
             <div class="col-shrink">
               <q-chat-message
                 v-show="message.role != 'system'"
-                :name="message.role == 'assistant' ? 'AI' : 'Human'"
-                :text="[wrapMessage(message.content)]"
+                :name="message.role == 'assistant' ? 'AI' : 'Me'"
                 :sent="message.role != 'assistant'"
                 :bg-color="
                   message.role == 'assistant' ? primary_color : 'light-grey'
                 "
-                :text-color="message.role == 'assistant' ? 'white' : 'black'"
-                :text-html="true"
+                :text-color="message.role == 'assistant' ? 'white' : 'black'"              
               >
+                <template v-slot:default>
+                  <div v-html="message.html" style="white-space:pre-wrap;">
+                  </div>
+                </template>
                 <template v-slot:avatar="props">
                   <q-avatar
                     :size="screenSize > 600 ? '58px' : '48px'"
@@ -403,6 +405,8 @@ import axios from "axios";
 import { v4 as uuidv4 } from "uuid";
 import _ from "lodash";
 import { ref } from "vue";
+//import prism from "prism";
+//import "prismjs/themes/prism.css";
 
 export default defineComponent({
   name: "IndexPage",
@@ -540,7 +544,11 @@ export default defineComponent({
           content:
             "You are ChatGPT, a large language model trained by OpenAI. Answer as concisely as possible.",
         },
-        { role: "user", content: "Hello, who are you?" },
+        {
+          role: "user",
+          content:
+            "Hello, who are you?",
+        },
         {
           role: "assistant",
           content: "I am ChatGPT created by OpenAI. How can I help you today?",
@@ -548,6 +556,8 @@ export default defineComponent({
       ],
       token_count: 0,
       temp_account_tf: true,
+      code: "body { background: blue; }",
+      messages_html:[],
       //user_setting:{
       //  bot_avatar: 'robot_1',
       //}, Hello, who are you?
@@ -599,6 +609,9 @@ export default defineComponent({
   },
   created: function () {
     var vm = this; // vm = view model, the vue instance
+    // vm.messages_html = [...vm.messages];
+    vm.messages_html = _.cloneDeep(vm.messages);
+    vm.messages_html.forEach(obj => obj.html = vm.escapeHtmlOutsideTables(obj.content));
     vm.convo_json = _.cloneDeep(TestJson);
     vm.ai_model_engine = "gpt-3.5-turbo";
 
@@ -738,16 +751,77 @@ export default defineComponent({
     },
   },
   methods: {
-    wrapMessage(message) {
-      return `<div style="white-space:pre-wrap;">${message}</div>`;
+    escapeHtml(html) {
+      var escaped = new Option(html).innerHTML;
+      return escaped;
+    },
+    escapeHtmlOutsideTables(html){
+      var vm = this;
+      const regex = /(<\/?table.*?>)|(<(?!\/?table)[^>]+>)|([^<]+)/gi;
+      let match;
+      let outputString = "";
+      while (match = regex.exec(html)) {
+        if (match[1]) {
+          // table tag found, add it to the output string unescaped
+          outputString += match[1];
+        } else if (match[2]) {
+          // non-table tag found, add it to the output string unescaped
+          outputString += match[2];
+        } else {
+          // non-tag text found, escape it and add to the output string
+          outputString += vm.escapeHtml(match[3]);
+        }
+      }
+
+      return outputString;
+    },
+    updateCodeBlocks() {
+      document.querySelectorAll('code').forEach((block) => {
+        hljs.highlightBlock(block)
+    })
+    },
+    escapeIfHtml(str){
+      var vm = this;
+      if (str.includes("html") || str.includes("javascript") || str.includes("script")){
+        return (vm.escapeHtml(str))
+      } else {
+        return str;
+      }
+    },
+    wrapCodeBlocks(inputString) {
+      var vm = this;
+      try {        
+        var table_start = "<table style=\"margin-top:8px;width:464px;border-spacing:0px;\"><tr style=\"padding-top:5px;\"><th style=\"color:black;margin:0px;padding:0px 0px 0px 5px;font-size:12px;background-color:#c9c6c3;border-top-left-radius: 5px;border-top-right-radius: 5px;display:flex;justify-content:space-between;align-items: center;\"><div>Code:</div><div style=\"text-align:right\"></div></th></tr><tr ><td style=\"margin:0px;padding:0px;\"><pre style=\"max-width: 464px;margin:0px;padding:0px;\"><code>";
+        var table_end = "</code></pre></td></tr></table>";
+
+        const regex = new RegExp('```([\\s\\S]*?)```', 'g');
+        var outputString = inputString.replace(regex, (match, group) => `${table_start}${vm.escapeIfHtml(group)}${table_end}`);
+        return outputString;
+
+      } catch(error) {
+        return inputString;
+      }
     },
     removeTags(str) {
       return str.replace(/<\/?pre[^>]*>|<\/?code>/gi, "");
     },
-    updateClipboard(newClip) {
-      var vm = this;
-      newClip = vm.removeTags(newClip);
-      navigator.clipboard.writeText(newClip).then(
+    updateClipboard(message){
+      const regex = new RegExp('```([\\s\\S]*?)```', 'g'); // find code blocks
+      const matches = message.match(regex);
+      var code_text = "";
+      if (matches != null){
+        for (var i=0; i < matches.length; i++){
+          code_text += matches[i];
+          code_text = code_text.replace(regex, (match, group) => `${group}\n\n`);
+        }        
+      }      
+      var clip_text = "";
+      if (code_text != ""){
+        clip_text = code_text; // only copy the code
+      } else {
+        clip_text = message; // no code copy everything
+      }
+      navigator.clipboard.writeText(clip_text).then(
         () => {
           /* clipboard successfully set */
         },
@@ -809,6 +883,7 @@ export default defineComponent({
       vm.toggle_spinner = true;
       // console.log(vm.messages);
       vm.messages.push({ role: "user", content: vm.user_input });
+      vm.messages_html.push({ role: "user", content: vm.user_input, html: vm.escapeHtmlOutsideTables(vm.user_input) });
       vm.user_input = "";
       axios
         .post(
@@ -816,7 +891,7 @@ export default defineComponent({
           {
             model: vm.ai_model_engine,
             messages: vm.messages,
-            max_tokens: 150,
+            max_tokens: 200,
             temperature: 0.9,
             top_p: 1,
             n: 1,
@@ -837,6 +912,15 @@ export default defineComponent({
             role: "assistant",
             content: response.data.choices[0].message.content,
           });
+          var messageWrapped = vm.wrapCodeBlocks(response.data.choices[0].message.content);
+          vm.messages_html.push({
+            role: "assistant",
+            content: response.data.choices[0].message.content,
+            html: vm.escapeHtmlOutsideTables(messageWrapped),
+          });
+          setTimeout(() => {
+          vm.updateCodeBlocks();
+        }, 20);
           const element = document.getElementById("inputbox");
           element.scrollIntoView();
           vm.token_count = response.data.usage.total_tokens;

@@ -6,6 +6,5 @@ const emitter = mitt();
 // more info on params: https://v2.quasar.dev/quasar-cli/boot-files
 export default boot(async ({ app} ) => {
   // something to do
-  console.log('running z booter');
   app.config.globalProperties.emitter = emitter;
 })
