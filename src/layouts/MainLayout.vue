@@ -482,7 +482,7 @@ export default defineComponent({
       prompt_progress: 0.0,
       intervalID: null,
       signup_hint: "",
-      primary_color: "pink",
+      primary_color: "cyan",
       temp_account_tf: true,
       update_value: "",
       is_setting_changed: false,
@@ -564,6 +564,7 @@ export default defineComponent({
     this.emitter.on("setting_change", (e) => {
       this.is_setting_changed = e.is_setting_changed;
       this.primary_color = e.primary_color;
+      this.is_signed_in = e.is_signed_in;
     });
     //console.log(`the masthead is now mounted.`)
     // EventBus.$on("signedin", this.refresh_layout);

@@ -79,7 +79,11 @@
                 :text-color="message.role == 'assistant' ? 'white' : 'black'"              
               >
                 <template v-slot:default>
-                  <div v-html="message.html" style="white-space:pre-wrap;">
+                  {{ message.code_is_html }}
+                  <div v-if="! message.code_is_html" v-html="message.html" style="white-space:pre-wrap;">
+                  </div>
+                  <div v-if="message.code_is_html" style="white-space:pre-wrap;">
+                    {{ message.content }}
                   </div>
                 </template>
                 <template v-slot:avatar="props">
@@ -612,6 +616,7 @@ export default defineComponent({
     // vm.messages_html = [...vm.messages];
     vm.messages_html = _.cloneDeep(vm.messages);
     vm.messages_html.forEach(obj => obj.html = vm.escapeHtmlOutsideTables(obj.content));
+    vm.messages_html.forEach(obj => obj.code_is_html = false);
     vm.convo_json = _.cloneDeep(TestJson);
     vm.ai_model_engine = "gpt-3.5-turbo";
 
@@ -629,7 +634,7 @@ export default defineComponent({
     if (localStorage.getItem("primary_color") != null) {
       vm.primary_color = localStorage.primary_color;
     } else {
-      vm.primary_color = "pink";
+      vm.primary_color = "cyan";
     }
     if (localStorage.getItem("temp_account_tf") != null) {
       vm.temp_account_tf = localStorage.temp_account_tf;
@@ -908,15 +913,18 @@ export default defineComponent({
           }
         )
         .then(function (response) {
+          var content = response.data.choices[0].message.content;
           vm.messages.push({
             role: "assistant",
-            content: response.data.choices[0].message.content,
+            content: content,
           });
-          var messageWrapped = vm.wrapCodeBlocks(response.data.choices[0].message.content);
+          var messageWrapped = vm.wrapCodeBlocks(content);
+          var code_is_html = (content.includes("html") || content.includes("<script>"));
           vm.messages_html.push({
             role: "assistant",
-            content: response.data.choices[0].message.content,
+            content: content,
             html: vm.escapeHtmlOutsideTables(messageWrapped),
+            code_is_html: code_is_html,
           });
           setTimeout(() => {
           vm.updateCodeBlocks();
@@ -1121,6 +1129,11 @@ export default defineComponent({
             localStorage.token = response.data.token;
             localStorage.username = response.data.username;
             localStorage.temp_account_tf = response.data.temp_account_tf;
+            vm.emitter.emit("setting_change", {
+              is_setting_changed: true,
+              primary_color: vm.primary_color,
+              is_signed_in: true,
+            });
             vm.$router.push("/");
           } else {
             vm.is_failure = true;

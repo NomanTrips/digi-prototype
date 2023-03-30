@@ -471,7 +471,6 @@ export default defineComponent({
       axios
         .get(`${process.env.API}/users/${localStorage.user_id}/billing`)
         .then(function (response) {
-          console.log(response);
           vm.stripe_customer_id = response.data.stripe_customer_id;
           if (vm.stripe_customer_id != undefined) {
             vm.is_stripe_customer = true;
@@ -497,7 +496,6 @@ export default defineComponent({
           customer_id: vm.stripe_customer_id,
         })
         .then(function (response) {
-          console.log(response);
           window.location.href = response.data.url;
         })
         .catch(function (error) {
@@ -531,7 +529,6 @@ export default defineComponent({
         "Content-Type": "application/json",
         Authorization: "Bearer " + localStorage.token,
       };
-      console.log(vm.primary_color);
       //axios.post(`http://localhost:3000/users/${localStorage.user_id}/settings`, {
       axios
         .post(
@@ -546,10 +543,10 @@ export default defineComponent({
           }
         )
         .then(function (response) {
-          console.log(response);
           vm.emitter.emit("setting_change", {
             is_setting_changed: true,
             primary_color: vm.primary_color,
+            is_signed_in: true,
           });
           // location.replace("/");
           // location.reload();
