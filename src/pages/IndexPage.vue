@@ -1,7 +1,6 @@
 <template>
-  <div class="q-pa-xs row justify-center">
-    <div style="width: 100%; max-width: 600px">
-      <q-card class="my-card" style="margin-bottom: 15px">
+  <div class="q-pa-xs" style="display:flex;justify-content:center;align-items:center;height:auto;">
+      <q-card class="my-card" flat style="max-width:600px;margin-bottom:10%;margin-top: 5%;">
         <q-card-section style="padding: 10px">
           <div
             v-show="ai_model_engine != 'gpt-3.5-turbo'"
@@ -214,16 +213,17 @@
                 icon="text_snippet"
                 @click="card = true"
                 class="q-mx-xs q-mb-md"
+                v-show="false"
                 >View prompt</q-btn
               >
               <q-btn
-                :size="screenSize > 600 ? 'md' : 'sm'"
+                size="sm"
                 outline
                 :color="primary_color"
                 icon="settings"
                 @click="show_settings = true"
                 class="q-mx-xs q-mb-md"
-              ></q-btn>
+              >AI Settings</q-btn>
               <q-chip
                 dense
                 class="q-mx-xs q-mb-md"
@@ -240,7 +240,7 @@
                 :size="screenSize > 600 ? 'md' : 'sm'"
               >
                 {{ token_count + Math.round(user_input.length / 4) }}/4096
-                <q-tooltip>Token limit</q-tooltip>
+                <q-tooltip anchor="bottom right">Conversation token limit: 1 token is ~ 4 characters</q-tooltip>
               </q-chip>
             </div>
           </div>
@@ -299,13 +299,8 @@
                       self="bottom middle"
                       :offset="[10, 10]"
                     >
-                      Davinci is the most powerful. Ada is the fastest.
+                      gpt-3.5 is the most capable. Ada is the fastest.
                     </q-tooltip>
-                    <template v-slot:hint>
-                      <div style="color: goldenrod">
-                        Sign up for Premium to talk to Davinci!
-                      </div>
-                    </template>
                   </q-select>
                 </div>
               </q-card-section>
@@ -397,7 +392,6 @@
           </q-dialog>
         </q-card-actions>
       </q-card>
-    </div>
   </div>
 </template>
 
@@ -787,7 +781,7 @@ export default defineComponent({
     },
     escapeIfHtml(str){
       var vm = this;
-      if (str.includes("html") || str.includes("javascript") || str.includes("script")){
+      if (str.includes("html") || str.includes("<template") || str.includes("<script")){
         return (vm.escapeHtml(str))
       } else {
         return str;

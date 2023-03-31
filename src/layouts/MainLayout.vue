@@ -4,7 +4,7 @@
       <q-toolbar :class="toolbarClass">
         <q-toolbar-title>
           <router-link to="/" style="text-decoration: none; color: white"
-            >Digissist</router-link
+            >Digi buddy</router-link
           >
         </q-toolbar-title>
         <div>
@@ -19,7 +19,6 @@
           />
           <q-btn
             v-show="is_signed_in === false || temp_account_tf === true"
-            icon="login"
             aria-label="login"
             to="/login"
             label="Login"
@@ -33,7 +32,7 @@
             v-show="is_signed_in === false || temp_account_tf === true"
             aria-label="signup"
             to="/signup"
-            label="Create Account"
+            label="Sign up"
             outline
             color="white"
             :size="screenSize > 600 ? 'sm' : 'xs'"
@@ -54,7 +53,7 @@
             v-show="is_signed_in === true"
             outline
             color="white"
-            icon="account_circle"
+            icon="settings"
             :size="screenSize > 600 ? 'sm' : 'xs'"
             @click="getSettings"
           >

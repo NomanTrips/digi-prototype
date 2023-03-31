@@ -1,8 +1,8 @@
 {
   "name": "digi-prototype",
   "version": "0.0.1",
-  "description": "A skin for gpt3",
-  "productName": "Digissist",
+  "description": "AI powered digital buddy",
+  "productName": "Digibuddy",
   "author": "NomanTrips <brianscott0017@yahoo.com>",
   "private": true,
   "scripts": {
