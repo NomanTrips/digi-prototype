@@ -1,6 +1,6 @@
 <template>
   <div class="q-pa-xs" style="display:flex;justify-content:center;align-items:center;height:auto;">
-      <q-card class="my-card" flat style="max-width:600px;margin-bottom:10%;margin-top: 5%;">
+      <q-card class="my-card" flat :style="{'width': cardWidth + 'px','margin-bottom':'10%','margin-top': '5%'}">
         <q-card-section style="padding: 10px">
           <div
             v-show="ai_model_engine != 'gpt-3.5-turbo'"
@@ -566,6 +566,13 @@ export default defineComponent({
     screenSize() {
       return this.$q.screen.width;
     },
+    cardWidth(){
+      if (this.$q.screen.width < 600){
+        return 350;
+      } else {
+        return 600;
+      }
+    },
     getBotAvatarPath() {
       var vm = this;
       if (vm.bot_avatar === null) {
@@ -789,12 +796,18 @@ export default defineComponent({
     },
     wrapCodeBlocks(inputString) {
       var vm = this;
+      var tableWidth;
+      if (this.$q.screen.width < 600){
+        tableWidth = 250;
+      } else {
+        tableWidth = 475;
+      }
       try {        
-        var table_start = "<table style=\"margin-top:8px;width:464px;border-spacing:0px;\"><tr style=\"padding-top:5px;\"><th style=\"color:black;margin:0px;padding:0px 0px 0px 5px;font-size:12px;background-color:#c9c6c3;border-top-left-radius: 5px;border-top-right-radius: 5px;display:flex;justify-content:space-between;align-items: center;\"><div>Code:</div><div style=\"text-align:right\"></div></th></tr><tr ><td style=\"margin:0px;padding:0px;\"><pre style=\"max-width: 464px;margin:0px;padding:0px;\"><code>";
+        var table_start = `<table style=\"margin-top:8px;width:${tableWidth}px;border-spacing:0px;\"><tr style=\"padding-top:5px;\"><th style=\"color:black;margin:0px;padding:0px 0px 0px 5px;font-size:12px;background-color:#c9c6c3;border-top-left-radius: 5px;border-top-right-radius: 5px;display:flex;justify-content:space-between;align-items: center;\"><div>Code:</div><div style=\"text-align:right\"></div></th></tr><tr ><td style=\"margin:0px;padding:0px;\"><pre style=\"width:${tableWidth}px;margin:0px;padding:0px;\"><code>`;
         var table_end = "</code></pre></td></tr></table>";
 
         const regex = new RegExp('```([\\s\\S]*?)```', 'g');
-        var outputString = inputString.replace(regex, (match, group) => `${table_start}${vm.escapeIfHtml(group)}${table_end}`);
+        var outputString = inputString.replace(regex, (match, group) => `${table_start}${group}${table_end}`);
         return outputString;
 
       } catch(error) {
@@ -913,7 +926,7 @@ export default defineComponent({
             content: content,
           });
           var messageWrapped = vm.wrapCodeBlocks(content);
-          var code_is_html = (content.includes("html") || content.includes("<script>"));
+          var code_is_html = (content.includes("html") || content.includes("<script") || content.includes("<template") || content.includes("<link"));
           vm.messages_html.push({
             role: "assistant",
             content: content,
