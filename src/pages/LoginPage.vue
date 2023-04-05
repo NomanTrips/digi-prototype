@@ -130,6 +130,11 @@ export default defineComponent({
           } else {
             localStorage.premium_tf = false;
           }
+          vm.emitter.emit("login_change", {
+            premium_tf: localStorage.premium_tf,
+            is_signed_in: vm.is_signed_in,
+            temp_account_tf: vm.temp_account_tf,
+          });
         })
         .catch(function (error) {
           console.log(error);

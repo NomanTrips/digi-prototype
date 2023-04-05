@@ -565,6 +565,9 @@ export default defineComponent({
       this.primary_color = e.primary_color;
       this.is_signed_in = e.is_signed_in;
     });
+    this.emitter.on("login_change", (e) => {
+      this.premium_tf = e.premium_tf;
+    });
     //console.log(`the masthead is now mounted.`)
     // EventBus.$on("signedin", this.refresh_layout);
   },
@@ -623,7 +626,7 @@ export default defineComponent({
           console.log(response);
           vm.stripe_customer_id = response.data.stripe_customer_id;
           vm.subscription_status = response.data.subscription_status;
-          if (vm.subscription_status === "active") {
+          if (vm.subscription_status === "active" || vm.subscription_status === "complete") {
             localStorage.premium_tf = true;
           } else {
             localStorage.premium_tf = false;
