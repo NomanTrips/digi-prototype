@@ -59,7 +59,7 @@
 
           <div
             v-show="ai_model_engine == 'gpt-3.5-turbo'"
-            v-for="message in messages_html"
+            v-for="message in messages"
             :key="message.content"
             :class="
               message.role == 'assistant'
@@ -78,12 +78,7 @@
                 :text-color="message.role == 'assistant' ? 'white' : 'black'"              
               >
                 <template v-slot:default>
-                  {{ message.code_is_html }}
-                  <div v-if="! message.code_is_html" v-html="message.html" style="white-space:pre-wrap;">
-                  </div>
-                  <div v-if="message.code_is_html" style="white-space:pre-wrap;">
-                    {{ message.content }}
-                  </div>
+                  <MessageBlock :message="message.content" />
                 </template>
                 <template v-slot:avatar="props">
                   <q-avatar
@@ -405,10 +400,11 @@ import _ from "lodash";
 import { ref } from "vue";
 //import prism from "prism";
 //import "prismjs/themes/prism.css";
+import MessageBlock from "components/MessageBlock.vue";
 
 export default defineComponent({
   name: "IndexPage",
-  Components: {},
+  components: {MessageBlock},
   data: function () {
     return {
       summarization_template:
@@ -556,6 +552,7 @@ export default defineComponent({
       temp_account_tf: true,
       code: "body { background: blue; }",
       messages_html:[],
+      htmlTester: "<pre><code>{{{<html>dis\n<div>Moar</div></html>}}}</code></pre>",
       //user_setting:{
       //  bot_avatar: 'robot_1',
       //}, Hello, who are you?
@@ -615,9 +612,9 @@ export default defineComponent({
   created: function () {
     var vm = this; // vm = view model, the vue instance
     // vm.messages_html = [...vm.messages];
-    vm.messages_html = _.cloneDeep(vm.messages);
-    vm.messages_html.forEach(obj => obj.html = vm.escapeHtmlOutsideTables(obj.content));
-    vm.messages_html.forEach(obj => obj.code_is_html = false);
+    // vm.messages_html = _.cloneDeep(vm.messages);
+    // vm.messages_html.forEach(obj => obj.html = vm.escapeHtmlOutsideTables(obj.content));
+    // vm.messages_html.forEach(obj => obj.code_is_html = false);
     vm.convo_json = _.cloneDeep(TestJson);
     vm.ai_model_engine = "gpt-3.5-turbo";
 
@@ -806,7 +803,8 @@ export default defineComponent({
         var table_start = `<table style=\"margin-top:8px;width:${tableWidth}px;border-spacing:0px;\"><tr style=\"padding-top:5px;\"><th style=\"color:black;margin:0px;padding:0px 0px 0px 5px;font-size:12px;background-color:#c9c6c3;border-top-left-radius: 5px;border-top-right-radius: 5px;display:flex;justify-content:space-between;align-items: center;\"><div>Code:</div><div style=\"text-align:right\"></div></th></tr><tr ><td style=\"margin:0px;padding:0px;\"><pre style=\"width:${tableWidth}px;margin:0px;padding:0px;\"><code>`;
         var table_end = "</code></pre></td></tr></table>";
 
-        const regex = new RegExp('```([\\s\\S]*?)```', 'g');
+        //const regex = new RegExp('```([\\s\\S]*?)```', 'g');
+        const regex = new RegExp('`{0,3}([\\s\\S]*?)`{0,3}', 'g');
         var outputString = inputString.replace(regex, (match, group) => `${table_start}${group}${table_end}`);
         return outputString;
 
@@ -895,7 +893,7 @@ export default defineComponent({
       vm.toggle_spinner = true;
       // console.log(vm.messages);
       vm.messages.push({ role: "user", content: vm.user_input });
-      vm.messages_html.push({ role: "user", content: vm.user_input, html: vm.escapeHtmlOutsideTables(vm.user_input) });
+      // vm.messages_html.push({ role: "user", content: vm.user_input, html: vm.escapeHtmlOutsideTables(vm.user_input) });
       vm.user_input = "";
       axios
         .post(
@@ -925,17 +923,17 @@ export default defineComponent({
             role: "assistant",
             content: content,
           });
-          var messageWrapped = vm.wrapCodeBlocks(content);
-          var code_is_html = (content.includes("html") || content.includes("<script") || content.includes("<template") || content.includes("<link"));
-          vm.messages_html.push({
-            role: "assistant",
-            content: content,
-            html: vm.escapeHtmlOutsideTables(messageWrapped),
-            code_is_html: code_is_html,
-          });
-          setTimeout(() => {
-          vm.updateCodeBlocks();
-        }, 20);
+          // var messageWrapped = vm.wrapCodeBlocks(content);
+          // var code_is_html = (content.includes("html") || content.includes("<script") || content.includes("<template") || content.includes("<link"));
+          // vm.messages_html.push({
+          //  role: "assistant",
+          //  content: content,
+          //  html: vm.escapeHtmlOutsideTables(messageWrapped),
+          //  code_is_html: code_is_html,
+          //});
+          //setTimeout(() => {
+          //vm.updateCodeBlocks();
+        //}, 20);
           const element = document.getElementById("inputbox");
           element.scrollIntoView();
           vm.token_count = response.data.usage.total_tokens;
