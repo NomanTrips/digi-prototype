@@ -126,7 +126,7 @@
         </q-card-section>
         <q-separator />
         <q-card-section style="padding: 8px">
-          <div style="max-width: 600px" id="inputbox">
+          <div style="max-width: 700px" id="inputbox">
             <q-chat-message
               style="font-style: italic"
               size="10"
@@ -567,7 +567,7 @@ export default defineComponent({
       if (this.$q.screen.width < 600){
         return 350;
       } else {
-        return 600;
+        return 700;
       }
     },
     getBotAvatarPath() {

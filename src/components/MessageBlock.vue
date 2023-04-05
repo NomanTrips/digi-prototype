@@ -2,7 +2,7 @@
 
     <div v-for="segment in messageSegments" :key="segment.id" style="white-space:pre-wrap;margin-bottom: 5px;" v-show="! displayRaw">
 
-        <table v-if="segment.isCode" style="margin-top:8px;width:475px;border-spacing:0px;">
+        <table v-if="segment.isCode" :style="{'margin-top':'8px', 'width': tableWidth + 'px', 'border-spacing':'0px'}">
           <tr style="padding-top:5px;">
             <th style="color:black;margin:0px;padding:0px 0px 0px 5px;font-size:12px;background-color:#c9c6c3;border-top-left-radius: 5px;border-top-right-radius: 5px;display:flex;justify-content:space-between;align-items: center;">
               <div>Code:</div>
@@ -10,7 +10,7 @@
           </tr>
           <tr>
             <td style="margin:0px;padding:0px;">
-              <pre style="width:475px;margin:0px;padding:0px;"><code >{{ segment.text }}</code></pre>
+              <pre :style="{'width':tableWidth + 'px', 'margin':'0px', 'padding':'0px'}"><code >{{ segment.text }}</code></pre>
             </td>
           </tr>
         </table>
@@ -36,7 +36,7 @@ export default defineComponent({
     data: function () {
         return {
             messageSegments: [],
-            tableWidth: 475,
+            tableWidth: 575,
             messageContainsCode: false,
             displayRaw: false,
         }
@@ -96,14 +96,18 @@ export default defineComponent({
         return arr;
       }
     },
+    created(){
+      //console.log(this.$q.screen.width);
+      if (this.$q.screen.width < 700){
+        this.tableWidth = 250;
+      } else {
+        this.tableWidth = 575;
+      }
+    },
     mounted() {
       this.messageSegments = this.strToArr(this.message);
       //this.highlightCode();
-      if (this.$q.screen.width < 600){
-        this.tableWidth = 250;
-      } else {
-        this.tableWidth = 475;
-      }
+
       setTimeout(() => {
           this.highlightCode();
         }, 5);
