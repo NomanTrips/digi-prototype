@@ -24,15 +24,14 @@
               <q-tooltip> Pick an Avatar </q-tooltip>
             </q-btn>
           </div>
-
           <div
             class="row justify-center text-caption"
-            v-show="!temp_account_tf"
+            v-show="temp_account_tf == false"
           >
             {{ username }}
           </div>
-          <div class="row justify-center text-caption" v-show="temp_account_tf">
-            Temp account
+          <div v-show="temp_account_tf == true" class="row justify-center text-caption" >
+            Temp account 
           </div>
 
           <div class="row justify-center text-subtitle1 q-mt-md q-mb-xs">
@@ -448,14 +447,15 @@ export default defineComponent({
       vm.is_signed_in = true;
       vm.username = localStorage.username;
     }
-    if (localStorage.getItem("temp_account_tf") != null) {
-      vm.temp_account_tf = localStorage.temp_account_tf;
+    if (localStorage.getItem("temp_account_tf") != null && localStorage.temp_account_tf == 'false') {
+      vm.temp_account_tf = false;
     }
     vm.get_billing_details();
     vm.getSettings();
     if (localStorage.premium_tf === "true") {
       vm.premium_tf = true;
     }
+
   },
   watch: {
     bot_avatar(old_avatar, new_avatar) {

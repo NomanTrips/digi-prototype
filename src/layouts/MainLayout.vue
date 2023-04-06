@@ -236,13 +236,13 @@
 
                 <div
                   class="row justify-center text-caption"
-                  v-show="!temp_account_tf"
+                  v-show="temp_account_tf == false"
                 >
                   {{ username }}
                 </div>
                 <div
                   class="row justify-center text-caption"
-                  v-show="temp_account_tf"
+                  v-show="temp_account_tf == true"
                 >
                   Temp account
                 </div>
@@ -496,7 +496,7 @@ export default defineComponent({
     },
     account_tier() {
       var vm = this;
-      if (vm.premium_tf) {
+      if (vm.premium_tf == true) {
         return "Premium";
       } else {
         return "Free tier";
@@ -531,13 +531,15 @@ export default defineComponent({
       vm.is_signed_in = true;
       vm.username = localStorage.username;
     }
-    //vm.get_billing_details();
-    if (localStorage.premium_tf === "true") {
-      vm.premium_tf = true;
+    vm.get_billing_details();
+    if (localStorage.getItem("premium_tf") != null) {
+      if (localStorage.premium_tf == "true") {
+        vm.premium_tf = true;
+      }
     }
 
     if (localStorage.getItem("temp_account_tf") != null) {
-      if (localStorage.temp_account_tf === "false") {
+      if (localStorage.temp_account_tf == "false") {
         vm.temp_account_tf = false;
       }
     }
@@ -569,6 +571,10 @@ export default defineComponent({
       this.premium_tf = e.premium_tf;
       this.is_signed_in = e.is_signed_in;
       this.temp_account_tf = e.temp_account_tf;
+
+      console.log(`emit premium: ${this.premium_tf}`);
+    console.log(`emit temp: ${this.temp_account_tf}`);
+    console.log(`emit signed in: ${this.is_signed_in}`);
     });
     //console.log(`the masthead is now mounted.`)
     // EventBus.$on("signedin", this.refresh_layout);
@@ -630,8 +636,10 @@ export default defineComponent({
           vm.subscription_status = response.data.subscription_status;
           if (vm.subscription_status === "active" || vm.subscription_status === "complete") {
             localStorage.premium_tf = true;
+            vm.premium_tf = true;
           } else {
             localStorage.premium_tf = false;
+            vm.premium_tf = false;
           }
         })
         .catch(function (error) {
@@ -660,6 +668,7 @@ export default defineComponent({
       localStorage.removeItem("avatar");
       localStorage.removeItem("primary_color");
       localStorage.removeItem("temp_account_tf");
+      localStorage.removeItem("is_signed_in");
       vm.is_signed_in = false;
       window.location.reload();
     },

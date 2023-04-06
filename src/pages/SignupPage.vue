@@ -271,8 +271,15 @@ export default defineComponent({
           if (response.status === 200) {
             localStorage.user_id = response.data.user_id;
             localStorage.token = response.data.token;
-            localStorage.username = response.data.username;
-            localStorage.temp_account_tf = response.data.temp_account_tf;
+            localStorage.username = vm.username;
+            localStorage.temp_account_tf = false;
+            localStorage.premium_tf = false;
+            localStorage.is_signed_in = true;
+            vm.emitter.emit("login_change", {
+              premium_tf: localStorage.premium_tf,
+              is_signed_in: localStorage.is_signed_in,
+              temp_account_tf: localStorage.temp_account_tf,
+            });
             vm.$router.push("/");
           } else {
             vm.is_failure = true;

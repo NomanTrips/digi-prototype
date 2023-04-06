@@ -1,0 +1,1 @@
+import{b as f}from"./index.110ba73c.js";function c(o){o=o||{};function i(e){let t=e.toLowerCase();return o[t]||(o[t]=[])}return{on(e,t){i(e).push(t)},off(e,t){let r=i(e),n=r.indexOf(t);~n&&r.splice(n,1)},emit(e,t){i("*").concat(i(e)).forEach(r=>{r(t)})}}}const s=c();var a=f(async({app:o})=>{o.config.globalProperties.emitter=s});export{a as default};

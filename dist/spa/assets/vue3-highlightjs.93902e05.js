@@ -1,1 +1,0 @@
-import{b as a}from"./index.f48fa537.js";import{l as h}from"./vs2015.c43dc632.js";function s(t){t.directive("highlightjs",function(i,o){for(var r=i.querySelectorAll("code"),e=0;e<r.length;e++){var l=r[e];typeof o.value=="string"&&(l.textContent=o.value),h.highlightBlock(l)}})}var u=a(async({app:t})=>{t.use(s)});export{u as default};

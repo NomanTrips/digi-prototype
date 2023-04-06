@@ -125,16 +125,11 @@ export default defineComponent({
         .then(function (response) {
           vm.stripe_customer_id = response.data.stripe_customer_id;
           vm.subscription_status = response.data.subscription_status;
-          if (vm.subscription_status === "active") {
+          if (vm.subscription_status == "active" || vm.subscription_status == "complete") {
             localStorage.premium_tf = true;
           } else {
             localStorage.premium_tf = false;
           }
-          vm.emitter.emit("login_change", {
-            premium_tf: localStorage.premium_tf,
-            is_signed_in: vm.is_signed_in,
-            temp_account_tf: vm.temp_account_tf,
-          });
         })
         .catch(function (error) {
           console.log(error);
@@ -143,6 +138,11 @@ export default defineComponent({
         })
         .then(function () {
           // always executed
+          vm.emitter.emit("login_change", {
+            premium_tf: localStorage.premium_tf,
+            is_signed_in: vm.is_signed_in,
+            temp_account_tf: vm.temp_account_tf,
+          });
           callback();
         });
     },
@@ -175,6 +175,11 @@ export default defineComponent({
             vm.temp_account_tf = false;
             vm.is_signed_in = true;
             localStorage.is_signed_in = true;
+            vm.emitter.emit("login_change", {
+              premium_tf: localStorage.premium_tf,
+              is_signed_in: vm.is_signed_in,
+              temp_account_tf: vm.temp_account_tf,
+            });
             //vm.$root.$forceUpdate();
             //console.log(vm.$parent.name);
             //vm.$router.go();

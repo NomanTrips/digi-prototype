@@ -634,10 +634,8 @@ export default defineComponent({
     } else {
       vm.primary_color = "cyan";
     }
-    if (localStorage.getItem("temp_account_tf") != null) {
-      vm.temp_account_tf = localStorage.temp_account_tf;
-    } else {
-      vm.temp_account_tf = true;
+    if (localStorage.getItem("temp_account_tf") != null && localStorage.temp_account_tf == 'false') {
+      vm.temp_account_tf = false;
     }
     // get settings
     if (localStorage.user_id) {
@@ -676,6 +674,9 @@ export default defineComponent({
       }
     }
     if (localStorage.premium_tf === "true") {
+      vm.premium_tf = true;
+    }
+    if (localStorage.getItem("premium_tf") != null && localStorage.premium_tf == 'true') {
       vm.premium_tf = true;
     }
 
@@ -1138,7 +1139,8 @@ export default defineComponent({
             localStorage.user_id = response.data.user_id;
             localStorage.token = response.data.token;
             localStorage.username = response.data.username;
-            localStorage.temp_account_tf = response.data.temp_account_tf;
+            localStorage.temp_account_tf = true;
+            localStorage.premium_tf = false;
             vm.emitter.emit("setting_change", {
               is_setting_changed: true,
               primary_color: vm.primary_color,
