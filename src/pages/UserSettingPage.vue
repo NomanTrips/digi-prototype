@@ -382,7 +382,7 @@ export default defineComponent({
       premium_tf: false,
       show_ai_avatars: false,
       is_stripe_customer: false,
-      primary_color: "pink",
+      primary_color: "cyan",
       temp_account_tf: true,
     };
   },
@@ -548,7 +548,7 @@ export default defineComponent({
           }
         )
         .then(function (response) {
-          vm.emitter.emit("setting_change", {
+          vm.emitter.emit("setting_refresh", {
             is_setting_changed: true,
             primary_color: vm.primary_color,
             is_signed_in: true,

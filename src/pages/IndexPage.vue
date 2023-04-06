@@ -1077,6 +1077,11 @@ export default defineComponent({
             localStorage.bot_avatar = response.data.bot_avatar;
             localStorage.avatar = response.data.avatar;
             localStorage.primary_color = response.data.primary_color;
+            vm.emitter.emit("setting_refresh", {
+              is_setting_changed: true,
+              primary_color: vm.primary_color,
+              is_signed_in: true,
+          });
           })
           .catch(function (error) {
             // handle error

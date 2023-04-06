@@ -560,13 +560,15 @@ export default defineComponent({
     */
   },
   mounted() {
-    this.emitter.on("setting_change", (e) => {
+    this.emitter.on("setting_refresh", (e) => {
       this.is_setting_changed = e.is_setting_changed;
       this.primary_color = e.primary_color;
       this.is_signed_in = e.is_signed_in;
     });
     this.emitter.on("login_change", (e) => {
       this.premium_tf = e.premium_tf;
+      this.is_signed_in = e.is_signed_in;
+      this.temp_account_tf = e.temp_account_tf;
     });
     //console.log(`the masthead is now mounted.`)
     // EventBus.$on("signedin", this.refresh_layout);
