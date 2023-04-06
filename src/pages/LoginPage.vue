@@ -172,7 +172,9 @@ export default defineComponent({
             localStorage.token = response.data.token;
             localStorage.username = response.data.username;
             localStorage.temp_account_tf = false;
+            vm.temp_account_tf = false;
             vm.is_signed_in = true;
+            localStorage.is_signed_in = true;
             //vm.$root.$forceUpdate();
             //console.log(vm.$parent.name);
             //vm.$router.go();

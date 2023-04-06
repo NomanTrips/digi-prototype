@@ -481,8 +481,10 @@ export default defineComponent({
           }
           if (vm.subscription_status === "active" || vm.subscription_status === "complete") {
             localStorage.premium_tf = true;
+            vm.premium_tf = true;
           } else {
             localStorage.premium_tf = false;
+            vm.premium_tf = false;
           }
         })
         .catch(function (error) {
